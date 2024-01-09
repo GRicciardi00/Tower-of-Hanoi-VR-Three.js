@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 
 import { DragControls } from 'three/addons/controls/DragControls.js';
-import { AmmoPhysics } from 'three/addons/physics/AmmoPhysics.js';
+import { AmmoPhysics } from '/AmmoPhysics.js';
 
 let container;
 let camera, scene, renderer;
@@ -12,9 +12,7 @@ let enableSelection = false;
 const objects = [];
 
 const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
-
-init();
-
+init()
 async function init() {
     physics = await AmmoPhysics();
     container = document.createElement( 'div' );
@@ -27,9 +25,9 @@ async function init() {
     scene.background = new THREE.Color( 0xf0f0f0 );
     scene.add( new THREE.AmbientLight( 0xaaaaaa ) );
 
-    //Adding the floor for phyisics
+    //Adding the floor for
     const floor = new THREE.Mesh(
-        new THREE.BoxGeometry( 10, 5, 10 ),
+        new THREE.BoxGeometry( 1000, 5, 100),
         new THREE.ShadowMaterial( { color: 0x444444 } )
     );
     floor.position.y = - 2.5;
@@ -73,13 +71,13 @@ async function init() {
         object.castShadow = true;
         object.receiveShadow = true;
         object.userData.physics = { mass: 1 };
-
         scene.add( object );
 
         objects.push( object );
 
     }
-
+    
+    physics.addScene( scene );
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -90,16 +88,34 @@ async function init() {
 
     controls = new DragControls( [ ... objects ], camera, renderer.domElement );
     controls.addEventListener( 'drag', render );
+    
+    controls.addEventListener('dragstart', function (event) {
+        const selectedObject = event.object;
+        // Store the initial position of the object
+        selectedObject.userData.dragStartPosition = selectedObject.position.clone();
+        // Temporarily disable physics for the dragged object
+        physics.removeMesh(selectedObject);
+    });
+    controls.addEventListener('dragend', function (event) {
+        const selectedObject = event.object;
+        // Re-enable physics for the dragged object
+         // Calculate the velocity based on the difference in position during dragging
+        const deltaPosition = new THREE.Vector3().subVectors(selectedObject.position, selectedObject.userData.dragStartPosition);
+        const velocity = deltaPosition.multiplyScalar(1); // Adjust the factor to control the strength of the velocity
+        // Re-add the object to the physics simulation
+        physics.addMesh(selectedObject, 1);
+        physics.applyCentralImpulse(selectedObject, velocity);
+        physics.applyAngularDamping(selectedObject, 1.7);
+        // Apply the velocity to the object
 
+        
+
+    });
+    
     //
 
     window.addEventListener( 'resize', onWindowResize );
-
-    document.addEventListener( 'click', onClick );
-    window.addEventListener( 'keydown', onKeyDown );
-    window.addEventListener( 'keyup', onKeyUp );
-
-    render();
+    animate();
 
 }
 
@@ -114,70 +130,13 @@ function onWindowResize() {
 
 }
 
-function onKeyDown( event ) {
-
-    enableSelection = ( event.keyCode === 16 ) ? true : false;
-
-}
-
-function onKeyUp() {
-
-    enableSelection = false;
-
-}
-
-function onClick( event ) {
-
-    event.preventDefault();
-
-    if ( enableSelection === true ) {
-
-        const draggableObjects = controls.getObjects();
-        draggableObjects.length = 0;
-
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-        raycaster.setFromCamera( mouse, camera );
-
-        const intersections = raycaster.intersectObjects( objects, true );
-
-        if ( intersections.length > 0 ) {
-
-            const object = intersections[ 0 ].object;
-
-            if ( group.children.includes( object ) === true ) {
-
-                object.material.emissive.set( 0x000000 );
-                scene.attach( object );
-
-            } else {
-
-                object.material.emissive.set( 0xaaaaaa );
-                group.attach( object );
-
-            }
-
-            controls.transformGroup = true;
-            draggableObjects.push( group );
-
-        }
-
-        if ( group.children.length === 0 ) {
-
-            controls.transformGroup = false;
-            draggableObjects.push( ...objects );
-
-        }
-
-    }
-
-    render();
-
-}
-
-function render() {
-
+function render(event) {
+    
     renderer.render( scene, camera );
+
+}
+function animate() {
+
+    renderer.setAnimationLoop( render );
 
 }
