@@ -4,11 +4,11 @@ import Scene from "./class/scene";
 const scene = new Scene();
 
 
-
 function display() {
     scene.renderer.render(scene.scene, scene.camera);
-    scene.updateRaycast();
+    scene.controls.update();
     requestAnimationFrame(display);
 
 }
+
 display();
