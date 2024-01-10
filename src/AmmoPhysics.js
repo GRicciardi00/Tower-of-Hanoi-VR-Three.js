@@ -28,27 +28,29 @@ async function AmmoPhysics() {
 
 		// TODO change type to is*
 
-		if ( geometry.type === 'BoxGeometry' ) {
-
-			const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
-			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
-			const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
-
-			const shape = new AmmoLib.btBoxShape( new AmmoLib.btVector3( sx, sy, sz ) );
-			shape.setMargin( 0.05 );
-
-			return shape;
-
-		} else if ( geometry.type === 'ExtrudeGeometry' || geometry.type === 'IcosahedronGeometry' ) {
-
-			const radius = parameters.radius !== undefined ? parameters.radius : 1;
-
-			const shape = new AmmoLib.btSphereShape( radius );
-			shape.setMargin( 0.05 );
-
-
-			return shape;
-
+		if (geometry.type === 'ExtrudeGeometry') {
+			const radius = parameters.options.amount !== undefined ? parameters.options.amount : 1;
+			const height = parameters.depth !== undefined ? parameters.depth : 1;
+	
+			// Create the Ammo.js shape for the disk
+			const shape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
+			shape.setMargin(0.03);
+	
+			// Create a hole by adding a smaller cylinder in the center
+			const holeRadius = parameters.holeRadius !== undefined ? parameters.holeRadius : 0.1;
+			const holeHeight = height;
+	
+			const holeShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(holeRadius, holeHeight / 2, holeRadius));
+			holeShape.setMargin(0.03);
+	
+			// Subtract the hole from the main shape to create the disk with a hole
+			const compoundShape = new AmmoLib.btCompoundShape();
+			const holeTransform = new AmmoLib.btTransform();
+			holeTransform.setIdentity();
+			compoundShape.addChildShape(holeTransform, holeShape);
+			compoundShape.addChildShape(holeTransform, shape);
+	
+			return compoundShape;
 		}
 
 		return null;
@@ -85,11 +87,9 @@ async function AmmoPhysics() {
 		if ( shape !== null ) {
 				
 			if ( mesh.isInstancedMesh ) {
-				console.log("topolino")
 				handleInstancedMesh( mesh, mass, shape );
 
 			} else if ( mesh.isMesh ) {
-				console.log("paperino")
 				handleMesh( mesh, mass, shape );
 
 			}
@@ -99,8 +99,6 @@ async function AmmoPhysics() {
 	}
 
 	function handleMesh( mesh, mass, shape ) {
-		console.log("pippo")
-
 		const position = mesh.position;
 		const quaternion = mesh.quaternion;
 
@@ -121,7 +119,6 @@ async function AmmoPhysics() {
 		world.addRigidBody( body );
 
 		if ( mass > 0 ) {
-			console.log("ciao")
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
 
@@ -318,6 +315,7 @@ async function AmmoPhysics() {
 	};
 
 }
+
 
 function compose( position, quaternion, array, index ) {
 
