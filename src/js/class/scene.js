@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { DragControls } from 'three/addons/controls/DragControls.js';
 
 import { GameStructure } from './hanoiStructure';
 
@@ -16,18 +16,26 @@ export default class Scene{
         document.body.appendChild(this.renderer.domElement);
 
 
-        this.setUpControls();      
         this.setUpCamera();
         this.setUpAudio();
         this.setUpBackground();
         //this.addAxesHelper();
-
+        
+ 
 
 
         // Hanoi Game
         this.gameStructure = new GameStructure();
         this.gameState = this.gameStructure.initializeTowerOfHanoiGame(this.scene);
-        
+        this.disks = [];
+        let disk1 = this.gameState.disks[0].mesh;
+        this.disks.push(disk1);
+        let disk2 = this.gameState.disks[1].mesh;
+        this.disks.push(disk2);
+        let disk3 = this.gameState.disks[2].mesh;
+        this.disks.push(disk3);
+
+
 
         // Light
         const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
@@ -49,15 +57,18 @@ export default class Scene{
     }
 
     setUpCamera(){
-        this.camera.position.set(0, 1, 2); 
+        this.camera.position.set(0, 3, 2); 
         this.camera.lookAt(0, 0, 0);
     }
 
-    setUpControls(){
-        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
-        this.controls.update();
-    }
+    setUpControl(){
+            //setup control
+            this.controls = new DragControls( [ ... this.disks ], this.camera, this.renderer.domElement );
+            this.controls.enableDamping = true;
+            this.controls.enableZoom = false;
+            this.controls.enablePan = false;
 
+    }
     setUpAudio(){
         const listener = new THREE.AudioListener();
         this.camera.add(listener);

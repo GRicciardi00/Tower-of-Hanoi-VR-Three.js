@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-
 /**
  * Class representing a disk with a hole in the center.
  */
@@ -20,7 +19,7 @@ export class Disk {
     this.createDisk();
     this.setDefaultPosition();
   }
-
+  
   /**
    * Create the geometry and material for the disk.
    */
@@ -48,13 +47,13 @@ export class Disk {
     };
 
     const diskGeometry = new THREE.ExtrudeGeometry(diskShape, extrudeSettings);
-
+    
     // Create the material with the texture
     const diskMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
     // Create the mesh
     this.mesh = new THREE.Mesh(diskGeometry, diskMaterial);
-
+    this.mesh.userData.physics = { mass: 1 };
     // Add edges with a line material
     const edgesGeometry = new THREE.EdgesGeometry(diskGeometry);
     const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
@@ -146,7 +145,7 @@ export class MainStructure {
     const baseGeometry = new THREE.BoxGeometry(extendedWidth, this.baseHeight, this.baseDepth);
     const baseMaterial = new THREE.MeshBasicMaterial({ map: baseTexture });
     this.baseMesh = new THREE.Mesh(baseGeometry, baseMaterial);
-
+    this.baseMesh.userData.physics = { mass: 0 };
     // Create the cylinder geometry
     const cylinderGeometry = new THREE.CylinderGeometry(this.cylinderRadius, this.cylinderRadius, this.cylinderHeight, 32);
     const cylinderMaterial = new THREE.MeshBasicMaterial({ map: cylinderTexture });
@@ -154,13 +153,13 @@ export class MainStructure {
     // Create cylinders and position them in the middle of each section
     this.cylinder1 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
     this.cylinder1.position.set(-extendedWidth / 2 + this.cylinderRadius + sectionWidth / 2, this.baseHeight / 2 + this.cylinderHeight / 2, 0);
-
+    this.cylinder1.userData.physics = { mass: 0 };
     this.cylinder2 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
     this.cylinder2.position.set(-extendedWidth / 2 + this.cylinderRadius + sectionWidth + sectionWidth / 2, this.baseHeight / 2 + this.cylinderHeight / 2, 0);
-
+    this.cylinder2.userData.physics = { mass: 0 };
     this.cylinder3 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
     this.cylinder3.position.set(-extendedWidth / 2 + this.cylinderRadius + 2 * sectionWidth + sectionWidth / 2, this.baseHeight / 2 + this.cylinderHeight / 2, 0);
-
+    this.cylinder3.userData.physics = { mass: 0 };
     // Create a group to hold all the objects
     this.mainStructure = new THREE.Group();
     this.mainStructure.add(this.baseMesh);

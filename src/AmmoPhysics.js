@@ -39,12 +39,13 @@ async function AmmoPhysics() {
 
 			return shape;
 
-		} else if ( geometry.type === 'SphereGeometry' || geometry.type === 'IcosahedronGeometry' ) {
+		} else if ( geometry.type === 'ExtrudeGeometry' || geometry.type === 'IcosahedronGeometry' ) {
 
 			const radius = parameters.radius !== undefined ? parameters.radius : 1;
 
 			const shape = new AmmoLib.btSphereShape( radius );
 			shape.setMargin( 0.05 );
+
 
 			return shape;
 
@@ -58,7 +59,7 @@ async function AmmoPhysics() {
 	const meshMap = new WeakMap();
 
 	function addScene( scene ) {
-
+		console.log(scene)
 		scene.traverse( function ( child ) {
 
 			if ( child.isMesh ) {
@@ -84,9 +85,11 @@ async function AmmoPhysics() {
 		if ( shape !== null ) {
 				
 			if ( mesh.isInstancedMesh ) {
+				console.log("topolino")
 				handleInstancedMesh( mesh, mass, shape );
 
 			} else if ( mesh.isMesh ) {
+				console.log("paperino")
 				handleMesh( mesh, mass, shape );
 
 			}
@@ -96,6 +99,7 @@ async function AmmoPhysics() {
 	}
 
 	function handleMesh( mesh, mass, shape ) {
+		console.log("pippo")
 
 		const position = mesh.position;
 		const quaternion = mesh.quaternion;
@@ -117,6 +121,7 @@ async function AmmoPhysics() {
 		world.addRigidBody( body );
 
 		if ( mass > 0 ) {
+			console.log("ciao")
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
 
@@ -196,7 +201,7 @@ async function AmmoPhysics() {
 	//Added by me
 	function removeMesh(mesh) {
 		const body = meshMap.get(mesh);
-	
+		console.log("remove")
 		if (body !== undefined) {
 			world.removeRigidBody(body);
 	
