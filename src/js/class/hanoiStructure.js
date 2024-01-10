@@ -34,8 +34,11 @@ export class GameStructure {
     const diskHeight = disk1.getHeightDisk();
 
     disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 , 0);
+    //disk1.setRotation(0,0,Math.PI/2);
     disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 , 0)
+    //disk2.setRotation(0,Math.PI/2,0);
     disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2, 0)
+    //disk3.setRotation(0,0,Math.PI/2);
     mainStructure.setPosition(0, 0, 0);
 
 

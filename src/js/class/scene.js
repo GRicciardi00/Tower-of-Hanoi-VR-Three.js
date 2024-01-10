@@ -27,10 +27,7 @@ export default class Scene{
         this.setUpAudio();
         this.setUpBackground();
         //this.addAxesHelper();
-        
- 
-
-
+   
         // Hanoi Game
         this.gameStructure = new GameStructure();
         this.gameState = this.gameStructure.initializeTowerOfHanoiGame(this.scene);

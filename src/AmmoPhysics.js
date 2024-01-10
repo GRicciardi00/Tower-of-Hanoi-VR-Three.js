@@ -1,7 +1,7 @@
 async function AmmoPhysics() {
 
 	if ( 'Ammo' in window === false ) {
-
+ 
 		console.error( 'AmmoPhysics: Couldn\'t find Ammo.js' );
 		return;
 
@@ -41,44 +41,35 @@ async function AmmoPhysics() {
 
 		} else if ( geometry.type === 'ExtrudeGeometry') {
 
-		const radius = parameters.options.amount !== undefined ? parameters.options.amount : 1;
-        const height = 0.1;
+		let radius = 0;
+        const height = 0.090;
 		if (id === 1){
-			radius = 0.6;
+			console.log("disk1")
+			radius = 0.5;
 		}
 		if (id === 2){
-			radius = 0.4;
+			console.log("disk2")
+			radius = 0.3;
 		}
 		if(id ===3){
-			radius = 0.2;
-		} else if (geometry.type === 'CylinderGeometry') {
-			// Handle cylinders
-			const radius = 0.05
-			const height = 0.7
-	
-			const cylinderShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
-			cylinderShape.setMargin(0.03);
-	
-			return cylinderShape;
-		}	
+			console.log("disk3")
+			radius = 0.1;
+		}
 
         // Create the Ammo.js shape for the main body of the disk
-        const diskShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
-        diskShape.setMargin(0.03);
+        const diskShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, 0, radius));
 
         // Create a larger cylindrical shape for the base with a hole in the center
-        const baseRadius = height; // Adjust as needed
-        const baseHeight = radius; // Adjust as needed
+        const baseRadius = radius; // Adjust as needed
+        const baseHeight = 1; // Adjust as needed
 
-        const baseShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(baseRadius, baseHeight / 2, baseRadius));
-        baseShape.setMargin(0.03);
+        const baseShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(baseRadius, baseHeight, baseRadius));
 
         // Create a hole in the center of the base
         const holeRadius = 0.1; // Adjust as needed
         const holeHeight = 0.1; // Adjust as needed
 
-        const holeShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(holeRadius, holeHeight / 2, holeRadius));
-        holeShape.setMargin(0.03);
+        const holeShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(holeRadius, holeHeight, holeRadius));
 
         // Subtract the hole from the base to create the base with a hole
         const compoundBaseShape = new AmmoLib.btCompoundShape();
@@ -98,11 +89,9 @@ async function AmmoPhysics() {
 		}
 		else if ( geometry.type === 'CylinderGeometry'){
 			// Handle cylinders
-			const radius = parameters.radius !== undefined ? parameters.radius : 1;
-			const height = parameters.height !== undefined ? parameters.height : 1;
-	
-			const cylinderShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
-			cylinderShape.setMargin(0.03);
+			const radius = 0.04;
+			const height = 0.6;
+			const cylinderShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height, radius));
 	
 			return cylinderShape;
 		}
@@ -134,9 +123,9 @@ async function AmmoPhysics() {
 
 	}
 
-	function addMesh( mesh, mass = 0, id=0 ) {
+	function addMesh( mesh, mass = 0 ) {
 
-		const shape = getShape( mesh.geometry, id );
+		const shape = getShape( mesh.geometry, mesh.userData.id );
 
 		if ( shape !== null ) {
 				

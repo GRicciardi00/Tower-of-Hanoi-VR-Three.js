@@ -56,6 +56,7 @@ export class Disk {
     // Create the mesh
     this.mesh = new THREE.Mesh(diskGeometry, diskMaterial);
     this.mesh.userData.physics = { mass: 1 };
+    this.mesh.userData.id = this.id;
     // Add edges with a line material
     const edgesGeometry = new THREE.EdgesGeometry(diskGeometry);
     const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
