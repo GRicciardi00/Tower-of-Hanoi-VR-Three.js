@@ -42,49 +42,22 @@ async function AmmoPhysics() {
 		} else if ( geometry.type === 'ExtrudeGeometry') {
 
 		let radius = 0;
-        const height = 0.090;
+        const height = 1;
 		if (id === 1){
 			console.log("disk1")
-			radius = 0.5;
+			radius = 0.6;
 		}
 		if (id === 2){
 			console.log("disk2")
-			radius = 0.3;
+			radius = 0.4;
 		}
 		if(id ===3){
 			console.log("disk3")
-			radius = 0.1;
+			radius = 0.2;
 		}
-
-        // Create the Ammo.js shape for the main body of the disk
-        const diskShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, 0, radius));
-
-        // Create a larger cylindrical shape for the base with a hole in the center
-        const baseRadius = radius; // Adjust as needed
-        const baseHeight = 1; // Adjust as needed
-
-        const baseShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(baseRadius, baseHeight, baseRadius));
-
-        // Create a hole in the center of the base
-        const holeRadius = 0.1; // Adjust as needed
-        const holeHeight = 0.1; // Adjust as needed
-
-        const holeShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(holeRadius, holeHeight, holeRadius));
-
-        // Subtract the hole from the base to create the base with a hole
-        const compoundBaseShape = new AmmoLib.btCompoundShape();
-        const holeTransform = new AmmoLib.btTransform();
-        holeTransform.setIdentity();
-        compoundBaseShape.addChildShape(holeTransform, holeShape);
-        compoundBaseShape.addChildShape(holeTransform, baseShape);
-
-        // Combine the main body and the base with a hole
-        const compoundShape = new AmmoLib.btCompoundShape();
-        const transform = new AmmoLib.btTransform();
-        transform.setIdentity();
-        compoundShape.addChildShape(transform, diskShape);
-        compoundShape.addChildShape(transform, compoundBaseShape);
-		return compoundShape;
+			// Create the Ammo.js shape for the main body of the disk using spheres
+			const diskShape = createDiskShape(radius, height);
+			return diskShape;
 
 		}
 		else if ( geometry.type === 'CylinderGeometry'){
@@ -343,7 +316,39 @@ async function AmmoPhysics() {
 		lastTime = time;
 
 	}
-
+	function createDiskShape(radius, height) {
+		const compoundShape = new AmmoLib.btCompoundShape();
+	
+		// Number of spheres to approximate the disk
+		const numSpheres = 16;
+	
+		// Angle between each sphere
+		const angleIncrement = (2 * Math.PI) / numSpheres;
+	
+		// Radius of the spheres
+		const sphereRadius = height / 8; //cause height / 2 is to big
+	
+		for (let i = 0; i < numSpheres; i++) {
+			const angle = i * angleIncrement;
+	
+			// Calculate the position of each sphere on the circumference -> polar coordinates to cartesian coordinates
+			const spherePosX = radius * Math.cos(angle); // x = r * cos(angle)
+			const spherePosY = radius * Math.sin(angle); // y = r * sin(angle)
+	
+			// Create a sphere shape
+			const sphereShape = new AmmoLib.btSphereShape(sphereRadius);
+	
+			// Create a transform for the sphere
+			const sphereTransform = new AmmoLib.btTransform();
+			sphereTransform.setIdentity();
+			sphereTransform.setOrigin(new AmmoLib.btVector3(spherePosX, spherePosY, 0));
+	
+			// Add the sphere to the compound shape
+			compoundShape.addChildShape(sphereTransform, sphereShape);
+		}
+	
+		return compoundShape;
+	}
 	// animate
 
 	setInterval( step, 1000 / frameRate );
@@ -389,5 +394,6 @@ function compose( position, quaternion, array, index ) {
 	array[ index + 15 ] = 1;
 
 }
+
 
 export { AmmoPhysics };
