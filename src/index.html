@@ -7,6 +7,18 @@
     <title>Tower of Hanoi</title>
 </head>
 <body>
+    <script src="ammo.wasm.js"></script>
+    <script src="ammo.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../build/three.module.js",
+                "three/addons/": "./jsm/"
+            }
+        }
+    </script>
     <script src="./js/app.js" type="module"></script>
+    
+    
 </body>
 </html>
