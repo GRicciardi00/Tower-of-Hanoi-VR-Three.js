@@ -22,10 +22,9 @@ export class GameStructure {
     // Example initialization logic (customize as needed)
     const mainStructure = new MainStructure(5, 1, 0.1, 0.05, 0.7, this.textureBase, this.textureCylindre)
 
-   
-    const disk1 = new Disk(0.6, undefined, undefined, this.textureDisk);
-    const disk2 = new Disk(0.4, undefined, undefined, this.textureDisk);
-    const disk3 = new Disk(0.2, undefined, undefined, this.textureDisk);
+    const disk1 = new Disk(1,0.6, undefined, undefined, this.textureDisk);
+    const disk2 = new Disk(2,0.4, undefined, undefined, this.textureDisk);
+    const disk3 = new Disk(3,0.2, undefined, undefined, this.textureDisk);
 
     let leftCylinderPosition = mainStructure.getLeftCylinderPosition();
     let centerCylinderPosition = mainStructure.getCenterCylinderPosition();

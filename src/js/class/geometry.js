@@ -6,12 +6,14 @@ import * as THREE from 'three';
 export class Disk {
   /**
    * Create a disk with a hole.
+   * @param {number} id - The id of the disk.
    * @param {number} radius - The radius of the disk.
    * @param {number} holeRadius - The hole radius of the disk (default 0.5).
    * @param {number} height - The height of the disk (default 0.5).
    * @param {string} texturePath - The file path for the disk texture image.
    */
-  constructor(radius, holeRadius = 0.1, height = 0.1, texturePath) {
+  constructor(id, radius, holeRadius = 0.1, height = 0.1, texturePath) {
+    this.id = id;
     this.radius = radius;
     this.holeRadius = holeRadius;
     this.height = height;
@@ -48,7 +50,7 @@ export class Disk {
 
     const diskGeometry = new THREE.ExtrudeGeometry(diskShape, extrudeSettings);
     
-    // Create the material with the texture
+    // Create the material with the  texture
     const diskMaterial = new THREE.MeshBasicMaterial({ map: texture });
 
     // Create the mesh

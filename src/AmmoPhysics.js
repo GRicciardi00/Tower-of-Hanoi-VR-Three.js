@@ -22,35 +22,89 @@ async function AmmoPhysics() {
 
 	//
 
-	function getShape( geometry ) {
+	function getShape( geometry, id = 0 ) {
 
 		const parameters = geometry.parameters;
 
 		// TODO change type to is*
 
-		if (geometry.type === 'ExtrudeGeometry') {
-			const radius = parameters.options.amount !== undefined ? parameters.options.amount : 1;
-			const height = parameters.depth !== undefined ? parameters.depth : 1;
+		if ( geometry.type === 'BoxGeometry' ) {
+
+			const sx = parameters.width !== undefined ? parameters.width / 2 : 0.5;
+			const sy = parameters.height !== undefined ? parameters.height / 2 : 0.5;
+			const sz = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
+
+			const shape = new AmmoLib.btBoxShape( new AmmoLib.btVector3( sx, sy, sz ) );
+			shape.setMargin( 0.05 );
+
+			return shape;
+
+		} else if ( geometry.type === 'ExtrudeGeometry') {
+
+		const radius = parameters.options.amount !== undefined ? parameters.options.amount : 1;
+        const height = 0.1;
+		if (id === 1){
+			radius = 0.6;
+		}
+		if (id === 2){
+			radius = 0.4;
+		}
+		if(id ===3){
+			radius = 0.2;
+		} else if (geometry.type === 'CylinderGeometry') {
+			// Handle cylinders
+			const radius = 0.05
+			const height = 0.7
 	
-			// Create the Ammo.js shape for the disk
-			const shape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
-			shape.setMargin(0.03);
+			const cylinderShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
+			cylinderShape.setMargin(0.03);
 	
-			// Create a hole by adding a smaller cylinder in the center
-			const holeRadius = parameters.holeRadius !== undefined ? parameters.holeRadius : 0.1;
-			const holeHeight = height;
+			return cylinderShape;
+		}	
+
+        // Create the Ammo.js shape for the main body of the disk
+        const diskShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
+        diskShape.setMargin(0.03);
+
+        // Create a larger cylindrical shape for the base with a hole in the center
+        const baseRadius = height; // Adjust as needed
+        const baseHeight = radius; // Adjust as needed
+
+        const baseShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(baseRadius, baseHeight / 2, baseRadius));
+        baseShape.setMargin(0.03);
+
+        // Create a hole in the center of the base
+        const holeRadius = 0.1; // Adjust as needed
+        const holeHeight = 0.1; // Adjust as needed
+
+        const holeShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(holeRadius, holeHeight / 2, holeRadius));
+        holeShape.setMargin(0.03);
+
+        // Subtract the hole from the base to create the base with a hole
+        const compoundBaseShape = new AmmoLib.btCompoundShape();
+        const holeTransform = new AmmoLib.btTransform();
+        holeTransform.setIdentity();
+        compoundBaseShape.addChildShape(holeTransform, holeShape);
+        compoundBaseShape.addChildShape(holeTransform, baseShape);
+
+        // Combine the main body and the base with a hole
+        const compoundShape = new AmmoLib.btCompoundShape();
+        const transform = new AmmoLib.btTransform();
+        transform.setIdentity();
+        compoundShape.addChildShape(transform, diskShape);
+        compoundShape.addChildShape(transform, compoundBaseShape);
+		return compoundShape;
+
+		}
+		else if ( geometry.type === 'CylinderGeometry'){
+			// Handle cylinders
+			const radius = parameters.radius !== undefined ? parameters.radius : 1;
+			const height = parameters.height !== undefined ? parameters.height : 1;
 	
-			const holeShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(holeRadius, holeHeight / 2, holeRadius));
-			holeShape.setMargin(0.03);
+			const cylinderShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height / 2, radius));
+			cylinderShape.setMargin(0.03);
 	
-			// Subtract the hole from the main shape to create the disk with a hole
-			const compoundShape = new AmmoLib.btCompoundShape();
-			const holeTransform = new AmmoLib.btTransform();
-			holeTransform.setIdentity();
-			compoundShape.addChildShape(holeTransform, holeShape);
-			compoundShape.addChildShape(holeTransform, shape);
-	
-			return compoundShape;
+			return cylinderShape;
 		}
 
 		return null;
@@ -80,9 +134,9 @@ async function AmmoPhysics() {
 
 	}
 
-	function addMesh( mesh, mass = 0 ) {
+	function addMesh( mesh, mass = 0, id=0 ) {
 
-		const shape = getShape( mesh.geometry );
+		const shape = getShape( mesh.geometry, id );
 
 		if ( shape !== null ) {
 				
@@ -99,6 +153,7 @@ async function AmmoPhysics() {
 	}
 
 	function handleMesh( mesh, mass, shape ) {
+
 		const position = mesh.position;
 		const quaternion = mesh.quaternion;
 
@@ -315,7 +370,6 @@ async function AmmoPhysics() {
 	};
 
 }
-
 
 function compose( position, quaternion, array, index ) {
 
