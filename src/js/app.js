@@ -1,6 +1,6 @@
 
 import * as THREE from 'three';
-
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { AmmoPhysics } from '/AmmoPhysics.js';
 import Scene from './class/scene.js';
 
@@ -16,11 +16,19 @@ async function init() {
     for (let i = 0; i < scene.disks.length; i++) {
        console.log(scene.disks_mashes[i].userData.physics.mass)
     }
+    //setup main orbit control
+    const orbitControls = new OrbitControls( scene.camera, scene.renderer.domElement );
     scene.setUpControl();
+    
     physics.addScene( scene.scene );
     scene.controls.addEventListener( 'drag', render );
     
     scene.controls.addEventListener('dragstart', function (event) {
+        //disable orbit control
+        orbitControls.enabled = false;
+        if(orbitControls.enabled === false){
+            console.log("orbit control disabled")
+        }
         const selectedObject = event.object;
         //console.log(selectedObject);
         // Store the initial position of the object
@@ -29,6 +37,8 @@ async function init() {
         physics.removeMesh(selectedObject);
     });
     scene.controls.addEventListener('dragend', function (event) {
+        //enable orbit control
+        orbitControls.enabled = true;
         const selectedObject = event.object;
         // Re-enable physics for the dragged object
          // Calculate the velocity based on the difference in position during dragging
