@@ -86,7 +86,7 @@ function render(event) {
         console.log("Moves: ",movesMade);
     }
     else if (Invalid == true){
-        console.log("Invalid move! - Require reset.");
+        console.log("Invalid move! - Reload page to reset.");
     }
 }
 function animate() {
