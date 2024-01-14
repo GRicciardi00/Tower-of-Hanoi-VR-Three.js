@@ -7,7 +7,10 @@ import Scene from './class/scene.js';
 
 let scene;
 let physics;
-let selectedObject;
+let selectedObject; 
+let makingMove = false;
+let movesMade = 0; 
+let Invalid = false;
 
 const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
 init()
@@ -26,6 +29,7 @@ async function init() {
     
     scene.controls.addEventListener('dragstart', function (event) {
         //disable orbit control
+        makingMove = true;
         orbitControls.enabled = false;
         if(orbitControls.enabled === false){
             console.log("orbit control disabled")
@@ -39,6 +43,8 @@ async function init() {
     });
     scene.controls.addEventListener('dragend', function (event) {
         //enable orbit control
+        makingMove = false;
+        movesMade +=1;
         orbitControls.enabled = true;
         const selectedObject = event.object;
         // Re-enable physics for the dragged object
@@ -73,9 +79,15 @@ function onWindowResize() {
 }
 
 function render(event) {
-    checkCollisions()
+    if (makingMove == false){
+        checkCollisions()};
     scene.renderer.render( scene.scene, scene.camera );
-    
+    if (Invalid == false){
+        console.log("Moves: ",movesMade);
+    }
+    else if (Invalid == true){
+        console.log("Invalid move! - Require reset.");
+    }
 }
 function animate() {
 
@@ -89,13 +101,23 @@ function checkCollisions(){
     scene.disk2BB.copy(scene.disks[1].mesh.geometry.boundingBox).applyMatrix4(scene.disks[1].mesh.matrixWorld);
     scene.disk3BB.copy(scene.disks[2].mesh.geometry.boundingBox).applyMatrix4(scene.disks[2].mesh.matrixWorld);
     if (scene.disk1BB.intersectsBox(scene.disk2BB)){
-        console.log("Disk 1 intersect Disk 2!")
+        // console.log("Disk 1 intersect Disk 2!")
+        // console.log(scene.disks[0].mesh.position.y)
+        if (scene.disks[0].mesh.position.y>scene.disks[1].mesh.position.y){
+            Invalid = true;
+        }
     }
     if (scene.disk1BB.intersectsBox(scene.disk3BB)){
-        console.log("Disk 1 intersect Disk 3!")
+        // console.log("Disk 1 intersect Disk 3!")
+        if (scene.disks[0].mesh.position.y>scene.disks[2].mesh.position.y){
+            Invalid = true;
+        }
     }
     if (scene.disk2BB.intersectsBox(scene.disk3BB)){
-        console.log("Disk 2 intersect Disk 3!")
+        // console.log("Disk 2 intersect Disk 3!")
+        if (scene.disks[1].mesh.position.y>scene.disks[2].mesh.position.y){
+            Invalid = true;
+        }
     }
     // console.log(scene.disk1BB)
 }
