@@ -44,15 +44,15 @@ async function AmmoPhysics() {
 		let radius = 0;
         const height = 1;
 		if (id === 1){
-			console.log("disk1")
+			// console.log("disk1")
 			radius = 0.6;
 		}
 		if (id === 2){
-			console.log("disk2")
+			// console.log("disk2")
 			radius = 0.4;
 		}
 		if(id ===3){
-			console.log("disk3")
+			// console.log("disk3")
 			radius = 0.2;
 		}
 			// Create the Ammo.js shape for the main body of the disk using spheres
@@ -215,7 +215,7 @@ async function AmmoPhysics() {
 	//Added by me
 	function removeMesh(mesh) {
 		const body = meshMap.get(mesh);
-		console.log("remove")
+		// console.log("remove")
 		if (body !== undefined) {
 			world.removeRigidBody(body);
 	
@@ -394,6 +394,7 @@ function compose( position, quaternion, array, index ) {
 	array[ index + 15 ] = 1;
 
 }
+
 
 
 export { AmmoPhysics };

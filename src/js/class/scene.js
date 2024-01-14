@@ -46,7 +46,14 @@ export default class Scene{
         this.disks.push(disk3);
         let disk3_mesh = disk3.mesh;
         this.disks_mashes.push(disk3_mesh);
-
+        
+        this.disk1BB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+        this.disk1BB.setFromObject(disk1_mesh)
+        // console.log(this.disk1BB)
+        this.disk2BB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+        this.disk2BB.setFromObject(disk2_mesh)
+        this.disk3BB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+        this.disk3BB.setFromObject(disk3_mesh)
 
         // Light
         const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
