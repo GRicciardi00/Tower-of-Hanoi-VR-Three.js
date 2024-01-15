@@ -11,35 +11,52 @@ let selectedObject;
 let makingMove = false;
 let movesMade = 0; 
 let Invalid = false;
+let raycaster, sphereInter, CURRENTCOLOR;
 
-const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
+
+const pointer = new THREE.Vector2();
 init()
 async function init() {
-    physics = await AmmoPhysics();
+    
     scene = new Scene();
+    physics = await AmmoPhysics(scene.scene);
+    raycaster = new THREE.Raycaster();
+    raycaster.params.Line.threshold = 3;
     // for (let i = 0; i < scene.disks.length; i++) {
     //    console.log(scene.disks_mashes[i].userData.physics.mass)
     // }
     //setup main orbit control
     const orbitControls = new OrbitControls( scene.camera, scene.renderer.domElement );
     scene.setUpControl();
-    
+    CURRENTCOLOR = scene.disks_mashes[0].material.color.getHex();
     physics.addScene( scene.scene );
-    scene.controls.addEventListener( 'drag', render );
-    
+    scene.controls.addEventListener( 'drag', function(event){
+        selectedObject = event.object
+        //Taking the position of the object dragged
+        const intersects = raycaster.intersectObject(selectedObject, true);
+        if (intersects.length > 0) {
+            // Get the intersection point in world coordinates
+            const intersectionPoint = intersects[0].point;
+            // Update the position of the dragged object
+            physics.setMeshPosition(selectedObject, intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+        }
+        render();
+
+    } );
+    document.addEventListener( 'pointermove', onPointerMove );
     scene.controls.addEventListener('dragstart', function (event) {
         //disable orbit control
         makingMove = true;
         orbitControls.enabled = false;
-        if(orbitControls.enabled === false){
-            console.log("orbit control disabled")
-        }
         selectedObject = event.object;
-        console.log(selectedObject);
         // Store the initial position of the object
         selectedObject.userData.dragStartPosition = selectedObject.position.clone();
         // Temporarily disable physics for the dragged object
         physics.removeMesh(selectedObject);
+        const intersects_0 = raycaster.intersectObjects( scene.disks_mashes, true );
+        if ( intersects_0.length > 0 ) {
+            intersects_0[0].object.material.color.set( 0xff0000 );
+        }
     });
     scene.controls.addEventListener('dragend', function (event) {
         //enable orbit control
@@ -47,6 +64,7 @@ async function init() {
         movesMade +=1;
         orbitControls.enabled = true;
         const selectedObject = event.object;
+        selectedObject.material.color.setHex( CURRENTCOLOR );
         // Re-enable physics for the dragged object
          // Calculate the velocity based on the difference in position during dragging
         const deltaPosition = new THREE.Vector3().subVectors(selectedObject.position, selectedObject.userData.dragStartPosition);
@@ -56,10 +74,6 @@ async function init() {
         // Apply the velocity to the object
         physics.applyCentralImpulse(selectedObject, velocity);
         physics.applyAngularDamping(selectedObject, 0.75);
-        
-
-        
-
     });
 
     window.addEventListener( 'resize', onWindowResize );
@@ -77,23 +91,40 @@ function onWindowResize() {
     render();
 
 }
-
+//Raycaster logic
+function onPointerMove( event ) {
+    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    raycaster.setFromCamera( pointer, scene.camera );
+    
+}
 function render(event) {
+    //taking mouse position
+    
     if (makingMove == false){
-        checkCollisions()};
+        checkCollisions()
+    };
+    //else makingMove == true -> Player is making a move
+
+
     scene.renderer.render( scene.scene, scene.camera );
+    
     if (Invalid == false){
         console.log("Moves: ",movesMade);
     }
     else if (Invalid == true){
         console.log("Invalid move! - Reload page to reset.");
     }
+    
 }
 function animate() {
 
     scene.renderer.setAnimationLoop( render );
     
 }
+
+
+
 
 function checkCollisions(){
     // console.log(scene.disks[0])

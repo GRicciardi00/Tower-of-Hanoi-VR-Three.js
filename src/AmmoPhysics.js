@@ -1,5 +1,6 @@
-async function AmmoPhysics() {
-
+import * as THREE from 'three';
+async function AmmoPhysics(scene) {
+	let sphereMeshes = []; // Array to store Three.js sphere meshes
 	if ( 'Ammo' in window === false ) {
  
 		console.error( 'AmmoPhysics: Couldn\'t find Ammo.js' );
@@ -25,7 +26,6 @@ async function AmmoPhysics() {
 	function getShape( geometry, id = 0 ) {
 
 		const parameters = geometry.parameters;
-
 		// TODO change type to is*
 
 		if ( geometry.type === 'BoxGeometry' ) {
@@ -40,35 +40,37 @@ async function AmmoPhysics() {
 			return shape;
 
 		} else if ( geometry.type === 'ExtrudeGeometry') {
-
 		let radius = 0;
-        const height = 1;
+		let y = 0;
 		if (id === 1){
 			// console.log("disk1")
 			radius = 0.6;
+			y = 0.08 //value calculated from hanoiStructure.js height of disk + 0.03
 		}
 		if (id === 2){
 			// console.log("disk2")
 			radius = 0.4;
+			y = 0.18
 		}
 		if(id ===3){
 			// console.log("disk3")
 			radius = 0.2;
+			y = 0.28
 		}
-			// Create the Ammo.js shape for the main body of the disk using spheres
-			const diskShape = createDiskShape(radius, height);
+			let diskShape = createDiskShape(radius, y);
 			return diskShape;
 
 		}
+		
 		else if ( geometry.type === 'CylinderGeometry'){
 			// Handle cylinders
-			const radius = 0.04;
-			const height = 0.6;
+			const radius = 0.05;
+			const height = 0.7;
 			const cylinderShape = new AmmoLib.btCylinderShape(new AmmoLib.btVector3(radius, height, radius));
 	
 			return cylinderShape;
 		}
-
+		
 		return null;
 
 	}
@@ -77,7 +79,8 @@ async function AmmoPhysics() {
 	const meshMap = new WeakMap();
 
 	function addScene( scene ) {
-		console.log(scene)
+		
+		//console.log(scene)
 		scene.traverse( function ( child ) {
 
 			if ( child.isMesh ) {
@@ -136,9 +139,10 @@ async function AmmoPhysics() {
 		world.addRigidBody( body );
 
 		if ( mass > 0 ) {
+
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
-
+			
 		}
 
 
@@ -203,7 +207,7 @@ async function AmmoPhysics() {
 
 			body.setAngularVelocity( new AmmoLib.btVector3( 0, 0, 0 ) );
 			body.setLinearVelocity( new AmmoLib.btVector3( 0, 0, 0 ) );
-
+			
 			worldTransform.setIdentity();
 			worldTransform.setOrigin( new AmmoLib.btVector3( position.x, position.y, position.z ) );
 			body.setWorldTransform( worldTransform );
@@ -316,34 +320,27 @@ async function AmmoPhysics() {
 		lastTime = time;
 
 	}
-	function createDiskShape(radius, height) {
-		const compoundShape = new AmmoLib.btCompoundShape();
-	
-		// Number of spheres to approximate the disk
-		const numSpheres = 16;
-	
-		// Angle between each sphere
-		const angleIncrement = (2 * Math.PI) / numSpheres;
-	
-		// Radius of the spheres
-		const sphereRadius = height / 8; //cause height / 2 is to big
+	function createDiskShape(radius, height) {	
+		// Create a circle of spheres
+		const numSpheres = 12;
+		const compoundShape = new Ammo.btCompoundShape();
 	
 		for (let i = 0; i < numSpheres; i++) {
-			const angle = i * angleIncrement;
+			const angle = (i / numSpheres) * Math.PI * 2;
+			const x = -1.6666666666666665+radius * Math.cos(angle);
+			const z = radius * Math.sin(angle);
+			const y = height; // Adjust the height as needed
 	
-			// Calculate the position of each sphere on the circumference -> polar coordinates to cartesian coordinates
-			const spherePosX = radius * Math.cos(angle); // x = r * cos(angle)
-			const spherePosY = radius * Math.sin(angle); // y = r * sin(angle)
-	
-			// Create a sphere shape
-			const sphereShape = new AmmoLib.btSphereShape(sphereRadius);
-	
-			// Create a transform for the sphere
-			const sphereTransform = new AmmoLib.btTransform();
+			const sphereShape = new Ammo.btSphereShape(radius/4); 
+			const sphereTransform = new Ammo.btTransform();
 			sphereTransform.setIdentity();
-			sphereTransform.setOrigin(new AmmoLib.btVector3(spherePosX, spherePosY, 0));
-	
-			// Add the sphere to the compound shape
+			sphereTransform.setOrigin(new Ammo.btVector3(x, y, z));
+			// Visualize the compound shape by creating Three.js spheres
+			const geometry = new THREE.SphereGeometry(radius/4, 32, 32);
+			const material = new THREE.MeshPhongMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
+			const sphereMesh = new THREE.Mesh(geometry, material);
+			sphereMesh.position.set(x, y, z);
+			scene.add(sphereMesh);
 			compoundShape.addChildShape(sphereTransform, sphereShape);
 		}
 	
@@ -352,7 +349,7 @@ async function AmmoPhysics() {
 	// animate
 
 	setInterval( step, 1000 / frameRate );
-
+	
 	return {
 		addScene: addScene,
 		addMesh: addMesh,

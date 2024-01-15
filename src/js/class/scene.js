@@ -54,7 +54,6 @@ export default class Scene{
         this.disk2BB.setFromObject(disk2_mesh)
         this.disk3BB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
         this.disk3BB.setFromObject(disk3_mesh)
-
         // Light
         const topLight = new THREE.DirectionalLight(0xffffff, 1); // (color, intensity)
         topLight.position.set(5, 5, 5) //top-left-ish
@@ -63,7 +62,7 @@ export default class Scene{
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 5);
         this.scene.add(ambientLight);
-
+        
       
     }
 
