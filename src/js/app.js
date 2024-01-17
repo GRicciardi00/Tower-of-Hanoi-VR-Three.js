@@ -6,6 +6,7 @@ import * as ENABLE3D from '@enable3d/ammo-physics';
 
 let scene;
 let selectedObject; 
+let movesMade = 0;
 let makingMove = false;
 let Invalid = false;
 let raycaster, selected,CURRENTCOLOR;
