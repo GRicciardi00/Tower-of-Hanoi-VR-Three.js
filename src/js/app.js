@@ -36,9 +36,9 @@ const ThreeScene = () => {
     physics.add.existing(scene.disk1.mesh, {mass: 1, offset: {y: -0.05}});
     physics.add.existing(scene.disk2.mesh, {mass: 1, offset: {y: -0.05}});
     physics.add.existing(scene.disk3.mesh, {mass: 1, offset: {y: -0.05}});
-    disk1 = scene.disk1.mesh; //big disk
+    disk1 = scene.disk1.mesh; //small disk
     disk2 = scene.disk2.mesh; //medium disk
-    disk3 = scene.disk3.mesh; //small disk
+    disk3 = scene.disk3.mesh; //big disk
     scene.controls.addEventListener( 'drag', function(event){
         selectedObject = event.object
         render();
@@ -76,9 +76,9 @@ const ThreeScene = () => {
         selected = null;
     });
     scene.setDisksPosition();
-    disk1.body.setCollisionFlags(1);
-    disk2.body.setCollisionFlags(1);
-    disk3.body.setCollisionFlags(1);
+    disk1.body.setCollisionFlags(0);
+    disk2.body.setCollisionFlags(0);
+    disk3.body.setCollisionFlags(0);
     cylinder1 = [disk1, disk2, disk3];
     cylinder2 = [];
     cylinder3 = [];
