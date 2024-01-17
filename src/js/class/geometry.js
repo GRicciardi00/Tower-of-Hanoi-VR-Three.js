@@ -308,36 +308,40 @@ export class Board {
   createText() {
         const loader = new FontLoader();
         loader.load('./assets/helvetiker_regular.typeface.json', (font) => {
-            const textOptions = {
-                font: font,
-                size: 0.3,
-                height: 0.05,
-            };
-
-            // Moves Text
-            const movesTextGeometry = new TextGeometry('Moves: ' + this.moves, textOptions);
-            const movesTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const movesText = new THREE.Mesh(movesTextGeometry, movesTextMaterial);
-            movesText.position.set(-this.boardWidth / 2, 0, 0); // Adjust position as needed
-            this.board.add(movesText);
-
-            // Status Text
-            const statusTextGeometry = new TextGeometry('Status: ' + this.status, textOptions);
-            const statusTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-            const statusText = new THREE.Mesh(statusTextGeometry, statusTextMaterial);
-            statusText.position.set(-this.boardWidth / 2, -this.boardHeight / 4, 0); // Adjust position as needed
-            this.board.add(statusText);
-        });
+          this.font = font; // Store the font for later use
+          this.updateMovesAndStatus(0, 'valid'); // Initial text setup
+      });
     }
 
-    // Method to update moves and status
     updateMovesAndStatus(moves, invalid) {
-        this.moves = moves;
+      this.moves = moves;
         if (invalid == true){
           this.status = 'invalid';
         }
         else{
           this.status = 'valid';
         }
-    }
+
+      const textOptions = {
+          font: this.font,
+          size: 0.3,
+          height: 0.05,
+      };
+
+      // Update moves text
+      if (this.movesText) this.board.remove(this.movesText); // Remove old text
+      const movesTextGeometry = new TextGeometry('Moves: ' + this.moves, textOptions);
+      const movesTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      this.movesText = new THREE.Mesh(movesTextGeometry, movesTextMaterial);
+      this.movesText.position.set(-this.boardHeight / 2, 0, 0);
+      this.board.add(this.movesText);
+
+      // Update status text
+      if (this.statusText) this.board.remove(this.statusText); // Remove old text
+      const statusTextGeometry = new TextGeometry('Status: ' + this.status, textOptions);
+      const statusTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      this.statusText = new THREE.Mesh(statusTextGeometry, statusTextMaterial);
+      this.statusText.position.set(-this.boardHeight / 2, -this.boardWidth / 4, 0);
+      this.board.add(this.statusText);
+  }
 }

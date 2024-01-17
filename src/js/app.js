@@ -8,6 +8,7 @@ let scene;
 let selectedObject; 
 let makingMove = false;
 let Invalid = false;
+let movesMade = 0;
 let raycaster, selected,CURRENTCOLOR;
 let disk1, disk2, disk3;
 let cylinder1, cylinder2, cylinder3;
@@ -45,6 +46,7 @@ const ThreeScene = () => {
 
     } );
     document.addEventListener( 'pointermove', onPointerMove );
+    document.addEventListener( 'pointerdown', onPointerDown );
     scene.controls.addEventListener('dragstart', function (event) {
         //disable orbit control
         makingMove = true;
@@ -107,12 +109,12 @@ function onPointerMove( event ) {
 }
 function render(event) {
     //taking mouse position
-    /*
+    
     if (makingMove == false){
         checkCollisions()
     };
     //else makingMove == true -> Player is making a move
-    */
+    
     physics.update(clock.getDelta() * 1000)
     physics.updateDebugger()
     scene.renderer.render( scene.scene, scene.camera );
@@ -135,21 +137,47 @@ function render(event) {
         selected.body.needUpdate = true
         prev = { x, y }
     }
-    /*
-    if (Invalid == false){
-        console.log("Moves: ",movesMade);
-    }
-    else if (Invalid == true){
-        console.log("Invalid move! - Reload page to reset.");
-    }
-    */
-    updateScoreBoardPosition();
+    
+    // if (Invalid == false){
+    //     console.log("Moves: ",movesMade);
+    // }
+    // else if (Invalid == true){
+    //     console.log("Invalid move! - Reload page to reset.");
+    // }
+    
+    scene.gameBoard.updateMovesAndStatus(movesMade,Invalid)
 }
 function animate() {
     scene.renderer.setAnimationLoop( render );
     
 }
 
+function onPointerDown(){
+    let intersectsResetButton = raycaster.intersectObject(scene.gameBoard.reset);
+    if ( intersectsResetButton.length > 0 ) {
+        //Change color of selected object
+        intersectsResetButton[0].object.material.color.set( 0xffb3b3 );
+        if(intersectsResetButton[0].object.body === disk1.body){
+            intersectsResetButton[0].object.body.setCollisionFlags(2);
+        selected = intersectsResetButton[0].object;
+        
+        
+    }
+    window.location.reload();
+    }
+    let intersectsExitButton = raycaster.intersectObject(scene.gameBoard.exit);
+    if ( intersectsExitButton.length > 0 ) {
+        //Change color of selected object
+        intersectsExitButton[0].object.material.color.set( 0xffb3b3 );
+        if(intersectsExitButton[0].object.body === disk1.body){
+            intersectsExitButton[0].object.body.setCollisionFlags(2);
+        selected = intersectsExitButton[0].object;
+        
+        
+    }
+    window.close();
+    }
+}
 
 function checkCollisions(){
     // console.log(scene.disks[0])
@@ -181,7 +209,3 @@ function checkCollisions(){
 window.addEventListener('DOMContentLoaded', () => {
     PhysicsLoader('/ammo', () => ThreeScene())
   })
-
-  function updateScoreBoardPosition(){
-    
-  }
