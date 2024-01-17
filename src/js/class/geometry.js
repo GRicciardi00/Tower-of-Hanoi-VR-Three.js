@@ -315,7 +315,7 @@ export class Board {
             };
 
             // Moves Text
-            const movesTextGeometry = new TextGeometry('Moves maded: ' + this.moves, textOptions);
+            const movesTextGeometry = new TextGeometry('Moves: ' + this.moves, textOptions);
             const movesTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
             const movesText = new THREE.Mesh(movesTextGeometry, movesTextMaterial);
             movesText.position.set(-this.boardWidth / 2, 0, 0); // Adjust position as needed
