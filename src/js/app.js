@@ -9,7 +9,6 @@ let selectedObject;
 let movesMade = 0;
 let makingMove = false;
 let Invalid = false;
-let movesMade = 0;
 let raycaster, selected,CURRENTCOLOR;
 let disk1, disk2, disk3;
 let disk1_move, disk2_move, disk3_move;
