@@ -25,18 +25,18 @@ export default class Scene{
         this.gameState = this.gameStructure.initializeTowerOfHanoiGame(this.scene);
         this.disks_mashes = [];
         this.disks = [];
-        let disk1 = this.gameState.disks[0]
+        this.disk1 = this.gameState.disks[0]
         this.table = this.gameState.mainStructure.mainStructure;
-        this.disks.push(disk1);
-        let disk1_mesh = disk1.mesh;
+        this.disks.push(this.disk1);
+        let disk1_mesh = this.disk1.mesh;
         this.disks_mashes.push(disk1_mesh);
-        let disk2 = this.gameState.disks[1]
-        this.disks.push(disk2);
-        let disk2_mesh = disk2.mesh;
+        this.disk2 = this.gameState.disks[1]
+        this.disks.push(this.disk2);
+        let disk2_mesh = this.disk2.mesh;
         this.disks_mashes.push(disk2_mesh);
-        let disk3 = this.gameState.disks[2]
-        this.disks.push(disk3);
-        let disk3_mesh = disk3.mesh;
+        this.disk3 = this.gameState.disks[2]
+        this.disks.push(this.disk3);
+        let disk3_mesh = this.disk3.mesh;
         this.disks_mashes.push(disk3_mesh);
         
         this.disk1BB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
@@ -64,7 +64,9 @@ export default class Scene{
         this.scene.add(this.gameBoard.board);
       
     }
-
+    setDisksPosition(){
+        this.gameStructure.setpositionsdisk(this.disk1, this.disk2, this.disk3);
+    }
 
     addAxesHelper(){
         this.axesHelper = new THREE.AxesHelper(5);

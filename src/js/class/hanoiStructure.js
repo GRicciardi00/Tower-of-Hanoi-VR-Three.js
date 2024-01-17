@@ -1,5 +1,6 @@
 import { Disk, MainStructure } from './geometry';
-
+let leftCylinderPosition, centerCylinderPosition, rightCylinderPosition;
+let baseHeight, diskHeight;
 /**
  * Class representing the game structure for the Tower of Hanoi game.
  */
@@ -12,7 +13,6 @@ export class GameStructure {
     this.textureCylindre = "../../assets/textures/wood_cylindre.jpg";
     this.textureDisk = "../../assets/textures/wood_disk.jpg";
   }
-
   /**
    * Initialize the Tower of Hanoi game with the main structure and disks.
    * @param {THREE.Scene} scene - The scene in which to initialize the game.
@@ -20,27 +20,27 @@ export class GameStructure {
    */
   initializeTowerOfHanoiGame(scene) {
     // Example initialization logic (customize as needed)
-    const mainStructure = new MainStructure(5, 2, 0.1, 0.04, 0.6, this.textureBase, this.textureCylindre)
+    const mainStructure = new MainStructure(5, 3, 0.1, 0.04, 0.6, this.textureBase, this.textureCylindre)
 
-    const disk1 = new Disk(1,0.6, undefined, undefined, this.textureDisk);
-    const disk2 = new Disk(2,0.4, undefined, undefined, this.textureDisk);
-    const disk3 = new Disk(3,0.2, undefined, undefined, this.textureDisk);
+    const disk1 = new Disk(1,0.6, undefined, undefined, this.textureDisk); //big disk
+    const disk2 = new Disk(2,0.4, undefined, undefined, this.textureDisk); //medium disk
+    const disk3 = new Disk(3,0.2, undefined, undefined, this.textureDisk); //small disk
 
-    let leftCylinderPosition = mainStructure.getLeftCylinderPosition();
-    let centerCylinderPosition = mainStructure.getCenterCylinderPosition();
-    let rightCylinderPosition = mainStructure.getRightCylinderPosition();
+    leftCylinderPosition = mainStructure.getLeftCylinderPosition();
+    centerCylinderPosition = mainStructure.getCenterCylinderPosition();
+    rightCylinderPosition = mainStructure.getRightCylinderPosition();
     console.log(leftCylinderPosition);
     console.log(centerCylinderPosition);
     console.log(rightCylinderPosition);
-    const baseHeight = mainStructure.getHeightBase();
-    const diskHeight = disk1.getHeightDisk();
+    baseHeight = mainStructure.getHeightBase();
+    diskHeight = disk1.getHeightDisk();
 
-    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 1, 0);
+    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.3, 0);
     
     //disk1.setRotation(0,0,Math.PI/2);
-    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.16, 0)
+    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.6, 0)
     //disk2.setRotation(0,Math.PI/2,0);
-    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.6, 0)
+    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.9, 0)
 
     //disk3.setRotation(0,0,Math.PI/2);
 
@@ -55,6 +55,10 @@ export class GameStructure {
       disks: [disk1, disk2, disk3]
     };
   }
-
+  setpositionsdisk(disk1, disk2, disk3){
+    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.26, 0);
+    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.16, 0)
+    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.26, 0)
+  }
   
 }

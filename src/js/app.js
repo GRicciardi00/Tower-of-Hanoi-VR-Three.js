@@ -10,6 +10,8 @@ let makingMove = false;
 let movesMade = 0; 
 let Invalid = false;
 let raycaster, selected,CURRENTCOLOR;
+let disk1, disk2, disk3;
+let cylinder1, cylinder2, cylinder3;
 let prev = { x: 0, y: 0 }
 const clock = new THREE.Clock()
 let physics;
@@ -18,7 +20,7 @@ const pointer = new THREE.Vector2();
 const ThreeScene = () => {
     //INIT
     scene = new Scene();
-
+    physics = new AmmoPhysics(scene.scene);
     raycaster = new THREE.Raycaster();
     raycaster.params.Line.threshold = 3;
     //setup main orbit control
@@ -32,18 +34,12 @@ const ThreeScene = () => {
     physics.add.existing(scene.table, {mass: 0});
     scene.table.body.setCollisionFlags(1);
     //Add physics to the disks
-    for (let i = 0; i < scene.disks_mashes.length; i++) {
-        physics.add.existing(scene.disks_mashes[i], {shape: 'hacd',mass: 1,});
-        // Adjust the position
-        scene.disks_mashes[i].position.copy(physics.position);
-
-        // Adjust the rotation
-        scene.disks_mashes[i].rotation.copy(physics.rotation);
-
-        // Adjust the scale
-        scene.disks_mashes[i].scale.copy(physics.scale);
-    }
-    
+    physics.add.existing(scene.disk1.mesh, {mass: 1, offset: {y: -0.05}});
+    physics.add.existing(scene.disk2.mesh, {mass: 1, offset: {y: -0.05}});
+    physics.add.existing(scene.disk3.mesh, {mass: 1, offset: {y: -0.05}});
+    disk1 = scene.disk1.mesh; //big disk
+    disk2 = scene.disk2.mesh; //medium disk
+    disk3 = scene.disk3.mesh; //small disk
     scene.controls.addEventListener( 'drag', function(event){
         selectedObject = event.object
         render();
@@ -59,10 +55,11 @@ const ThreeScene = () => {
         if ( intersects.length > 0 ) {
             //Change color of selected object
             intersects[0].object.material.color.set( 0xffb3b3 );
+            if(intersects[0].object.body === disk1.body){
             intersects[0].object.body.setCollisionFlags(2);
             selected = intersects[0].object;
         }
-        
+        }
     });
     scene.controls.addEventListener('dragend', function (event) {
         //enable orbit control
@@ -72,9 +69,20 @@ const ThreeScene = () => {
         const selectedObject = event.object;
         selectedObject.material.color.setHex( CURRENTCOLOR );
         selectedObject.body.setCollisionFlags(0);
+        const intersects = raycaster.intersectObjects( scene.disks_mashes, true );
+        if ( intersects.length > 0 ) {
+            //Change color of selected object
+            intersects[0].object.body.setCollisionFlags(0);
+        }
         selected = null;
     });
-
+    scene.setDisksPosition();
+    disk1.body.setCollisionFlags(1);
+    disk2.body.setCollisionFlags(1);
+    disk3.body.setCollisionFlags(1);
+    cylinder1 = [disk1, disk2, disk3];
+    cylinder2 = [];
+    cylinder3 = [];
     window.addEventListener( 'resize', onWindowResize );
     animate();
     
@@ -112,18 +120,19 @@ function render(event) {
     if (selected?.body.getCollisionFlags() === 2) {
         const { x, y } = pointer
 
-        const speed = 1
+        const speed = 0.1
         const movementX = (x - prev.x) * speed
         const movementZ = (y - prev.y) * -speed
 
         // since the scene has a rotation of -Math.PI / 4,
         // we adjust the movement by -Math.PI / 4
-        const v3 = new THREE.Vector3(movementX, 0, movementZ)
-        v3.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 4)
+        //const v3 = new THREE.Vector3(movementX, 0, movementZ)
+        //v3.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 4)
 
-        selected.position.x += v3.x
-        selected.position.y += v3.y
-        selected.position.z += v3.z
+        selected.position.x += movementX
+        //console.log(selected.body.position.y- selected.position.y)
+        selected.body.position.y += 2
+        selected.position.z += movementZ
         selected.body.needUpdate = true
         prev = { x, y }
     }

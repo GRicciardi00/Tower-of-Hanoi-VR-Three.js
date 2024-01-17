@@ -61,6 +61,7 @@ export class Disk {
     // Add edges with a line material
     const edgesGeometry = new THREE.EdgesGeometry(diskGeometry);
     const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+  
     const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
 
     // Add the edges to the main mesh
