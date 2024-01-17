@@ -20,7 +20,7 @@ export class GameStructure {
    */
   initializeTowerOfHanoiGame(scene) {
     // Example initialization logic (customize as needed)
-    const mainStructure = new MainStructure(5, 1, 0.1, 0.05, 0.7, this.textureBase, this.textureCylindre)
+    const mainStructure = new MainStructure(5, 2, 0.1, 0.03, 0.6, this.textureBase, this.textureCylindre)
 
     const disk1 = new Disk(1,0.6, undefined, undefined, this.textureDisk);
     const disk2 = new Disk(2,0.4, undefined, undefined, this.textureDisk);
@@ -29,20 +29,20 @@ export class GameStructure {
     let leftCylinderPosition = mainStructure.getLeftCylinderPosition();
     let centerCylinderPosition = mainStructure.getCenterCylinderPosition();
     let rightCylinderPosition = mainStructure.getRightCylinderPosition();
-
+    console.log(leftCylinderPosition);
+    console.log(centerCylinderPosition);
+    console.log(rightCylinderPosition);
     const baseHeight = mainStructure.getHeightBase();
     const diskHeight = disk1.getHeightDisk();
 
-    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 , 0);
+    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.2, 0);
     
     //disk1.setRotation(0,0,Math.PI/2);
-    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 , 0)
+    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.4, 0)
     //disk2.setRotation(0,Math.PI/2,0);
-    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2, 0)
+    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.6, 0)
 
     //disk3.setRotation(0,0,Math.PI/2);
-    mainStructure.setPosition(0, 0, 0);
-
 
     scene.add(mainStructure.mainStructure);
     scene.add(disk1.mesh);

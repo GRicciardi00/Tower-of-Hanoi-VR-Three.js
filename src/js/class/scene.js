@@ -14,15 +14,6 @@ export default class Scene{
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
-         //Adding the floor for
-        const floor = new THREE.Mesh(
-            new THREE.BoxGeometry( 1000, 5, 100),
-            new THREE.MeshLambertMaterial( { color: 0x444444 } )
-        );
-        floor.position.y = - 2.5;
-        floor.receiveShadow = true;
-        floor.userData.physics = { mass: 0 };
-        this.scene.add( floor );
         this.setUpCamera();
         this.setUpAudio();
         this.setUpBackground();
@@ -35,6 +26,7 @@ export default class Scene{
         this.disks_mashes = [];
         this.disks = [];
         let disk1 = this.gameState.disks[0]
+        this.table = this.gameState.mainStructure.mainStructure;
         this.disks.push(disk1);
         let disk1_mesh = disk1.mesh;
         this.disks_mashes.push(disk1_mesh);
