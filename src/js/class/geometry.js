@@ -57,7 +57,6 @@ export class Disk {
 
     // Create the mesh
     this.mesh = new THREE.Mesh(diskGeometry, diskMaterial);
-    this.mesh.userData.physics = { mass: 1 };
     this.mesh.userData.id = this.id;
     // Add edges with a line material
     const edgesGeometry = new THREE.EdgesGeometry(diskGeometry);
@@ -158,13 +157,10 @@ export class MainStructure {
     // Create cylinders and position them in the middle of each section
     this.cylinder1 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
     this.cylinder1.position.set(-extendedWidth / 2 + this.cylinderRadius + sectionWidth / 2, this.baseHeight / 2 + this.cylinderHeight / 2, 0);
-    this.cylinder1.userData.physics = { mass: 0 };
     this.cylinder2 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
     this.cylinder2.position.set(-extendedWidth / 2 + this.cylinderRadius + sectionWidth + sectionWidth / 2, this.baseHeight / 2 + this.cylinderHeight / 2, 0);
-    this.cylinder2.userData.physics = { mass: 0 };
     this.cylinder3 = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
     this.cylinder3.position.set(-extendedWidth / 2 + this.cylinderRadius + 2 * sectionWidth + sectionWidth / 2, this.baseHeight / 2 + this.cylinderHeight / 2, 0);
-    this.cylinder3.userData.physics = { mass: 0 };
     // Create a group to hold all the objects
     this.mainStructure = new THREE.Group();
     this.mainStructure.add(this.baseMesh);

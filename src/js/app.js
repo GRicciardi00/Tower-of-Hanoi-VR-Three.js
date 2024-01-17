@@ -9,7 +9,8 @@ let selectedObject;
 let makingMove = false;
 let movesMade = 0; 
 let Invalid = false;
-let raycaster, CURRENTCOLOR;
+let raycaster, selected,CURRENTCOLOR;
+let prev = { x: 0, y: 0 }
 const clock = new THREE.Clock()
 let physics;
 const { AmmoPhysics, PhysicsLoader } = ENABLE3D
@@ -29,10 +30,20 @@ const ThreeScene = () => {
     physics.debug.enable();
     // static ground
     physics.add.existing(scene.table, {mass: 0});
+    scene.table.body.setCollisionFlags(1);
     //Add physics to the disks
-    for (let i = 0; i < scene.disks.length; i++) {
-        physics.add.existing(scene.disks_mashes[i], {mass: 1});
+    for (let i = 0; i < scene.disks_mashes.length; i++) {
+        physics.add.existing(scene.disks_mashes[i], {shape: 'hacd',mass: 1,});
+        // Adjust the position
+        scene.disks_mashes[i].position.copy(physics.position);
+
+        // Adjust the rotation
+        scene.disks_mashes[i].rotation.copy(physics.rotation);
+
+        // Adjust the scale
+        scene.disks_mashes[i].scale.copy(physics.scale);
     }
+    
     scene.controls.addEventListener( 'drag', function(event){
         selectedObject = event.object
         render();
@@ -44,10 +55,14 @@ const ThreeScene = () => {
         makingMove = true;
         orbitControls.enabled = false;
         selectedObject = event.object;
-        const intersects_0 = raycaster.intersectObjects( scene.disks_mashes, true );
-        if ( intersects_0.length > 0 ) {
-            intersects_0[0].object.material.color.set( 0xff0000 );
+        const intersects = raycaster.intersectObjects( scene.disks_mashes, true );
+        if ( intersects.length > 0 ) {
+            //Change color of selected object
+            intersects[0].object.material.color.set( 0xffb3b3 );
+            intersects[0].object.body.setCollisionFlags(2);
+            selected = intersects[0].object;
         }
+        
     });
     scene.controls.addEventListener('dragend', function (event) {
         //enable orbit control
@@ -56,11 +71,13 @@ const ThreeScene = () => {
         orbitControls.enabled = true;
         const selectedObject = event.object;
         selectedObject.material.color.setHex( CURRENTCOLOR );
-
+        selectedObject.body.setCollisionFlags(0);
+        selected = null;
     });
 
     window.addEventListener( 'resize', onWindowResize );
     animate();
+    
 
 }
 
@@ -92,6 +109,24 @@ function render(event) {
     physics.update(clock.getDelta() * 1000)
     physics.updateDebugger()
     scene.renderer.render( scene.scene, scene.camera );
+    if (selected?.body.getCollisionFlags() === 2) {
+        const { x, y } = pointer
+
+        const speed = 1
+        const movementX = (x - prev.x) * speed
+        const movementZ = (y - prev.y) * -speed
+
+        // since the scene has a rotation of -Math.PI / 4,
+        // we adjust the movement by -Math.PI / 4
+        const v3 = new THREE.Vector3(movementX, 0, movementZ)
+        v3.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 4)
+
+        selected.position.x += v3.x
+        selected.position.y += v3.y
+        selected.position.z += v3.z
+        selected.body.needUpdate = true
+        prev = { x, y }
+    }
     /*
     if (Invalid == false){
         console.log("Moves: ",movesMade);
@@ -103,7 +138,6 @@ function render(event) {
     updateScoreBoardPosition();
 }
 function animate() {
-
     scene.renderer.setAnimationLoop( render );
     
 }
