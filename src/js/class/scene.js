@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DragControls } from 'three/addons/controls/DragControls.js';
 
 import { GameStructure } from './hanoiStructure';
-
+import { Board } from './geometry';
 
 
 export default class Scene{
@@ -55,6 +55,13 @@ export default class Scene{
         const ambientLight = new THREE.AmbientLight(0xffffff, 5);
         this.scene.add(ambientLight);
         
+        //game board
+        this.gameBoard = new Board('grey', 2, 3.5); 
+        // Position the Board instance relative to the camera
+        const distance = 2; // Adjust as needed
+        this.gameBoard.board.position.set(-1, 1, -distance);
+        // Add the board to the scene
+        this.scene.add(this.gameBoard.board);
       
     }
 
@@ -107,7 +114,7 @@ export default class Scene{
                 this.scene.add(model);
             },
             (xhr) => {
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                // console.log((xhr.loaded / xhr.total * 100) + '% loaded');
             },
             (error) => {
                 console.error('Erreur lors du chargement du modèle :', error);

@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 /**
  * Class representing a disk with a hole in the center.
@@ -230,3 +232,115 @@ export class MainStructure {
 
 }
 
+export class Board {
+  constructor(color = 'grey', boardHeight = 1, boardWidth = 1) {
+      this.color = color;
+      this.boardHeight = boardHeight;
+      this.boardWidth = boardWidth;
+      this.moves = 0; // Initialize moves
+      this.status = 'valid'; // Initialize status
+
+      // Create the board geometry and material
+      const boardGeometry = new THREE.PlaneGeometry(this.boardWidth, this.boardHeight);
+      const boardMaterial = new THREE.MeshBasicMaterial({ color: this.color, side: THREE.DoubleSide });
+      this.board = new THREE.Mesh(boardGeometry, boardMaterial);
+
+      // Create buttons
+      this.createButtons();
+      this.createText();
+  }
+
+  createButtons() {
+      // Define button dimensions
+      const buttonWidth = 0.6;
+      const buttonHeight = 0.2;
+      const buttonDepth = 0.1;
+      const buttonGeometry = new THREE.BoxGeometry(buttonWidth, buttonHeight, buttonDepth);
+
+      // Example: Exit Button
+      const exitMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // red color
+      this.exit = new THREE.Mesh(buttonGeometry, exitMaterial);
+      this.exit.position.set(-this.boardWidth / 2 + buttonWidth, this.boardHeight / 2 - buttonHeight, 0.1);
+      
+
+      // Example: Reset Button
+      const resetMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // blue color
+      this.reset = new THREE.Mesh(buttonGeometry, resetMaterial);
+      this.reset.position.set(-this.boardWidth / 2 + 3 * buttonWidth, this.boardHeight / 2 - buttonHeight, 0.1);
+      
+
+      const playMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // blue color
+      this.play = new THREE.Mesh(buttonGeometry, playMaterial);
+      this.play.position.set(-this.boardWidth / 2 + 5 * buttonWidth, this.boardHeight / 2 - buttonHeight, 0.1);
+
+      const loader = new FontLoader();
+      loader.load('./assets/helvetiker_regular.typeface.json', (font)=>{
+          const textOptions = {
+              font: font,
+              size: 0.05,
+              height: 0.05,
+          };
+      // Create text geometry for each button
+      const exitTextGeometry = new TextGeometry('Exit', textOptions);
+      const resetTextGeometry = new TextGeometry('Reset', textOptions);
+      const play_pauseTextGeometry = new TextGeometry('Play/Pause', textOptions);
+
+      // Create meshes for the text
+      const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const exitText = new THREE.Mesh(exitTextGeometry, textMaterial);
+      const resetText = new THREE.Mesh(resetTextGeometry, textMaterial);
+      const playPauseText = new THREE.Mesh(play_pauseTextGeometry, textMaterial);
+
+      // Position the text on the buttons
+      exitText.position.set(-0.1, -0.05, 0.05); // Adjust these values as needed
+      resetText.position.set(-0.1, -0.05, 0.05);
+      playPauseText.position.set(-0.1, -0.05, 0.05);
+
+      // Add the text to the buttons
+      console.log(this.exit)
+      this.exit.add(exitText);
+      this.reset.add(resetText);
+      this.play.add(playPauseText);
+      });
+
+      this.board.add(this.exit);
+      this.board.add(this.reset);
+      this.board.add(this.play);
+  }
+
+  createText() {
+        const loader = new FontLoader();
+        loader.load('./assets/helvetiker_regular.typeface.json', (font) => {
+            const textOptions = {
+                font: font,
+                size: 0.3,
+                height: 0.05,
+            };
+
+            // Moves Text
+            const movesTextGeometry = new TextGeometry('Moves maded: ' + this.moves, textOptions);
+            const movesTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const movesText = new THREE.Mesh(movesTextGeometry, movesTextMaterial);
+            movesText.position.set(-this.boardWidth / 2, 0, 0); // Adjust position as needed
+            this.board.add(movesText);
+
+            // Status Text
+            const statusTextGeometry = new TextGeometry('Status: ' + this.status, textOptions);
+            const statusTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const statusText = new THREE.Mesh(statusTextGeometry, statusTextMaterial);
+            statusText.position.set(-this.boardWidth / 2, -this.boardHeight / 4, 0); // Adjust position as needed
+            this.board.add(statusText);
+        });
+    }
+
+    // Method to update moves and status
+    updateMovesAndStatus(moves, invalid) {
+        this.moves = moves;
+        if (invalid == true){
+          this.status = 'invalid';
+        }
+        else{
+          this.status = 'valid';
+        }
+    }
+}

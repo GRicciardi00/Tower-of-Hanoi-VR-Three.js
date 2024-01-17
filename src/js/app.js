@@ -11,12 +11,13 @@ let movesMade = 0;
 let Invalid = false;
 let raycaster, CURRENTCOLOR;
 const clock = new THREE.Clock()
-let physics
+let physics;
 const { AmmoPhysics, PhysicsLoader } = ENABLE3D
 const pointer = new THREE.Vector2();
 const ThreeScene = () => {
     //INIT
     scene = new Scene();
+
     raycaster = new THREE.Raycaster();
     raycaster.params.Line.threshold = 3;
     //setup main orbit control
@@ -99,7 +100,7 @@ function render(event) {
         console.log("Invalid move! - Reload page to reset.");
     }
     */
-    
+    updateScoreBoardPosition();
 }
 function animate() {
 
@@ -138,3 +139,7 @@ function checkCollisions(){
 window.addEventListener('DOMContentLoaded', () => {
     PhysicsLoader('/ammo', () => ThreeScene())
   })
+
+  function updateScoreBoardPosition(){
+    
+  }
