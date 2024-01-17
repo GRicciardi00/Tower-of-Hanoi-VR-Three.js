@@ -6,11 +6,13 @@ import * as ENABLE3D from '@enable3d/ammo-physics';
 
 let scene;
 let selectedObject; 
+let movesMade = 0;
 let makingMove = false;
 let Invalid = false;
 let movesMade = 0;
 let raycaster, selected,CURRENTCOLOR;
 let disk1, disk2, disk3;
+let disk1_move, disk2_move, disk3_move;
 let cylinder1, cylinder2, cylinder3;
 let prev = { x: 0, y: 0 }
 const clock = new THREE.Clock()
@@ -43,7 +45,6 @@ const ThreeScene = () => {
     scene.controls.addEventListener( 'drag', function(event){
         selectedObject = event.object
         render();
-
     } );
     document.addEventListener( 'pointermove', onPointerMove );
     document.addEventListener( 'pointerdown', onPointerDown );
@@ -85,6 +86,11 @@ const ThreeScene = () => {
     cylinder2 = [];
     cylinder3 = [];
     window.addEventListener( 'resize', onWindowResize );
+    disk1.body.on.collision((otherObject, event) => {
+        if (otherObject.name !== 'ground') {
+          console.log(otherObject)
+        }
+      })
     animate();
     
 
@@ -147,6 +153,7 @@ function render(event) {
     
     scene.gameBoard.updateMovesAndStatus(movesMade,Invalid)
 }
+
 function animate() {
     scene.renderer.setAnimationLoop( render );
     
@@ -181,6 +188,7 @@ function onPointerDown(){
 
 function checkCollisions(){
     // console.log(scene.disks[0])
+    //updating bounding box and geometry
     scene.disk1BB.copy(scene.disks[0].mesh.geometry.boundingBox).applyMatrix4(scene.disks[0].mesh.matrixWorld);
     scene.disk2BB.copy(scene.disks[1].mesh.geometry.boundingBox).applyMatrix4(scene.disks[1].mesh.matrixWorld);
     scene.disk3BB.copy(scene.disks[2].mesh.geometry.boundingBox).applyMatrix4(scene.disks[2].mesh.matrixWorld);
@@ -195,6 +203,7 @@ function checkCollisions(){
         // console.log("Disk 1 intersect Disk 3!")
         if (scene.disks[0].mesh.position.y>scene.disks[2].mesh.position.y){
             Invalid = true;
+
         }
     }
     if (scene.disk2BB.intersectsBox(scene.disk3BB)){
@@ -209,3 +218,9 @@ function checkCollisions(){
 window.addEventListener('DOMContentLoaded', () => {
     PhysicsLoader('/ammo', () => ThreeScene())
   })
+
+  function updateScoreBoardPosition(){
+    
+  }
+
+
