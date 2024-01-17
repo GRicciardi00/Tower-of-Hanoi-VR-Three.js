@@ -7,7 +7,6 @@ import * as ENABLE3D from '@enable3d/ammo-physics';
 let scene;
 let selectedObject; 
 let makingMove = false;
-commit 
 let Invalid = false;
 let raycaster, selected,CURRENTCOLOR;
 let disk1, disk2, disk3;
