@@ -35,12 +35,12 @@ export class GameStructure {
     baseHeight = mainStructure.getHeightBase();
     diskHeight = disk1.getHeightDisk();
 
-    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.3, 0);
+    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.10, 0);
     
     //disk1.setRotation(0,0,Math.PI/2);
-    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.6, 0)
+    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.20, 0)
     //disk2.setRotation(0,Math.PI/2,0);
-    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.8, 0)
+    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.30, 0)
 
     //disk3.setRotation(0,0,Math.PI/2);
 
@@ -56,9 +56,9 @@ export class GameStructure {
     };
   }
   setpositionsdisk(disk1, disk2, disk3){
-    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.26, 0);
-    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.16, 0)
-    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.26, 0)
+    disk1.setPosition(leftCylinderPosition.x, baseHeight - diskHeight / 2 + 0.10, 0);
+    disk2.setPosition(leftCylinderPosition.x, baseHeight + diskHeight / 2 + 0.20, 0)
+    disk3.setPosition(leftCylinderPosition.x, baseHeight +   3 * diskHeight / 2 + 0.30, 0)
   }
   
 }

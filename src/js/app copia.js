@@ -10,7 +10,8 @@ let movesMade = 0;
 let makingMove = false;
 let Invalid = false;
 let raycaster, selected,CURRENTCOLOR;
-let disk1, disk2, disk3;
+let disk1, disk2, disk3,disk_onTop;
+
 let prev = { x: 0, y: 0 }
 const clock = new THREE.Clock()
 let physics;
@@ -30,33 +31,31 @@ const ThreeScene = () => {
     //Add physics to the scene
     physics.debug.enable();
     // static ground
-    physics.add.existing(scene.table, {name: "table", mass: 0});
+    physics.add.existing(scene.table, {mass: 0});
     scene.table.body.setCollisionFlags(1);
     //Add physics to the disks
-    physics.add.existing(scene.disk1.mesh, {mass: 1, offset: {y: -0.05}});
-    physics.add.existing(scene.disk2.mesh, {mass: 1, offset: {y: -0.05}});
-    physics.add.existing(scene.disk3.mesh, {mass: 1, offset: {y: -0.05}});
+    physics.add.existing(scene.disk1.mesh, {mass: 1, offset: {y: -0.06}});
+    physics.add.existing(scene.disk2.mesh, {mass: 1.3, offset: {y: -0.06}});
+    physics.add.existing(scene.disk3.mesh, {mass: 1.7, offset: {y: -0.06}});
     disk1 = scene.disk1.mesh; //small disk
     disk2 = scene.disk2.mesh; //medium disk
     disk3 = scene.disk3.mesh; //big disk
-     //Initial animation -> 3 disks falling
-     disk1.body.setCollisionFlags(0);
-     disk2.body.setCollisionFlags(0);
-     disk3.body.setCollisionFlags(0);
-     //After 1 second make the disks static, so they can't move and collide
-     setTimeout(() => {
-         console.log("set collision to 1")
-         disk1.body.setCollisionFlags(1);
-         disk2.body.setCollisionFlags(1);
-         disk3.body.setCollisionFlags(1);
-     }, 800); // 1000 milliseconds = 1 seconds
     scene.controls.addEventListener( 'drag', function(event){
         if (selected?.body.getCollisionFlags() === 2) {
             const { x, y } = pointer
+    
             const speed = 0.03
             const movementX = (x - prev.x) * speed
             const movementZ = (y - prev.y) * -speed
+    
+            // since the scene has a rotation of -Math.PI / 4,
+            // we adjust the movement by -Math.PI / 4
+            //const v3 = new THREE.Vector3(movementX, 0, movementZ)
+            //v3.applyAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 4)
+    
             selected.position.x += movementX
+            //console.log(selected.body.position.y- selected.position.y)
+            selected.body.position.y += 0
             selected.position.z += movementZ
             selected.body.needUpdate = true
             prev = { x, y }
@@ -71,15 +70,13 @@ const ThreeScene = () => {
         makingMove = true;
         orbitControls.enabled = false;
         selectedObject = event.object;
-        const intersects_disks = raycaster.intersectObjects( scene.disks_mashes, true );
-        if ( intersects_disks.length > 0 ) {
+        const intersects = raycaster.intersectObjects( scene.disks_mashes, true );
+        if ( intersects.length > 0 ) {
             //Change color of selected object
-            intersects_disks[0].object.material.color.set( 0xffb3b3 );
-            let disk_onTop = hasDisksOnTop(intersects_disks[0].object,scene.disks_mashes)
-            console.log("disk on top variable: ",disk_onTop)
-            if(disk_onTop === false){
-                selected = intersects_disks[0].object;
-                console.log("selected: ",selected.body.getCollisionFlags())
+            intersects[0].object.material.color.set( 0xffb3b3 );
+            selected = intersects[0].object;
+            disk_onTop = hasDisksOnTop(selected,scene.disks_mashes)
+            if(!disk_onTop){
                 selected.body.setCollisionFlags(2)
             }
         }
@@ -87,23 +84,29 @@ const ThreeScene = () => {
     scene.controls.addEventListener('dragend', function (event) {
         //enable orbit control
         makingMove = false;
+        movesMade +=1;
         orbitControls.enabled = true;
         const selectedObject = event.object;
-        if (selectedObject.body.getCollisionFlags() === 2){
-            movesMade +=1;
-        }
         selectedObject.material.color.setHex( CURRENTCOLOR );
         selectedObject.body.setCollisionFlags(0);
-        //When the object is dropped, check if it is on the table
-        //If it is on the table, set the collision flag to 1 (static)
-        selectedObject.body.on.collision((otherObject, event) => {
-            if (otherObject.name === 'table') selectedObject.body.setCollisionFlags(1);
-          })
         selected = null;
     });
     scene.setDisksPosition();
-   
+    //Initial animation -> 3 disks falling
+    disk1.body.setCollisionFlags(0);
+    disk2.body.setCollisionFlags(0);
+    disk3.body.setCollisionFlags(0);
+    //if the smallest disk collide with the other disk -> make object static
+    // collision between blueBox and redBox (will set body.checkCollisions = true, on the blueBox and the redBox)
+    setTimeout(() => {
+        console.log("set collision to 1")
+        disk1.body.setCollisionFlags(1);
+        disk2.body.setCollisionFlags(1);
+        disk3.body.setCollisionFlags(1);
+    }, 1000); // 2000 milliseconds = 2 seconds
     window.addEventListener( 'resize', onWindowResize );
+    //Checking collisions of disks to enable the movement
+    //Each disk can't move if there are other disks on top on it
     animate();
     
 
@@ -126,15 +129,26 @@ function onPointerMove( event ) {
     raycaster.setFromCamera( pointer, scene.camera );
     
 }
-function render(event) {    
+function render(event) {
+    //taking mouse position
+    
     if (makingMove == false){
         checkCollisions()
     };
+    //else makingMove == true -> Player is making a move
     
     physics.update(clock.getDelta() * 1000)
     physics.updateDebugger()
     scene.renderer.render( scene.scene, scene.camera );
-
+    
+    
+    // if (Invalid == false){
+    //     console.log("Moves: ",movesMade);
+    // }
+    // else if (Invalid == true){
+    //     console.log("Invalid move! - Reload page to reset.");
+    // }
+    
     scene.gameBoard.updateMovesAndStatus(movesMade,Invalid)
 }
 
@@ -148,15 +162,26 @@ function onPointerDown(){
     if ( intersectsResetButton.length > 0 ) {
         //Change color of selected object
         intersectsResetButton[0].object.material.color.set( 0xffb3b3 );
-        window.location.reload();
+        if(intersectsResetButton[0].object.body === disk1.body){
+            intersectsResetButton[0].object.body.setCollisionFlags(2);
+        selected = intersectsResetButton[0].object;
+        
+        
+    }
+    window.location.reload();
     }
     let intersectsExitButton = raycaster.intersectObject(scene.gameBoard.exit);
     if ( intersectsExitButton.length > 0 ) {
         //Change color of selected object
         intersectsExitButton[0].object.material.color.set( 0xffb3b3 );
-        window.close();
+        if(intersectsExitButton[0].object.body === disk1.body){
+            intersectsExitButton[0].object.body.setCollisionFlags(2);
+        selected = intersectsExitButton[0].object;
+        
+        
     }
-
+    window.close();
+    }
 }
 
 function checkCollisions(){
@@ -188,23 +213,6 @@ function checkCollisions(){
     // console.log(scene.disk1BB)
 }
 
-function hasDisksOnTop(targetDisk, allDisks) {
-    const targetIndex = allDisks.indexOf(targetDisk);
-    if (targetIndex === -1) {
-        console.error("Target disk not found in the list.");
-        return false;
-    }
-    // Iterate over disks above the target disk
-    for (let i = targetIndex + 1; i < allDisks.length; i++) {
-        const upperDisk = allDisks[i];
-        if (upperDisk.position.y > targetDisk.position.y) {
-            console.log("disk on top")
-            return true; // There is a disk on top
-        }
-    }
-    //No disk on top
-    return false; // There is no disk on top
-}
 window.addEventListener('DOMContentLoaded', () => {
     PhysicsLoader('/ammo', () => ThreeScene())
   })
@@ -213,4 +221,20 @@ window.addEventListener('DOMContentLoaded', () => {
     
   }
 
+  function hasDisksOnTop(targetDisk, allDisks) {
+    const targetIndex = allDisks.indexOf(targetDisk);
+    if (targetIndex === -1) {
+        console.error("Target disk not found in the list.");
+        return true;
+    }
+    // Iterate over disks above the target disk
+    for (let i = targetIndex + 1; i < allDisks.length; i++) {
+        const upperDisk = allDisks[i];
+        if (upperDisk.position.y > targetDisk.position.y) {
+            console.log("no disk on top")
+            return true; // There is a disk on top
+        }
+    }
 
+    return false; // No disks on top
+}
