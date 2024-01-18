@@ -11,12 +11,19 @@
 \contentsline {paragraph}{Height Retrieval}{7}{section*.7}%
 \contentsline {subsubsection}{\numberline {2.1.2}MainStructure Class}{7}{subsubsection.2.1.2}%
 \contentsline {paragraph}{Class Structure}{7}{section*.8}%
-\contentsline {subsection}{\numberline {2.2}3D Background Environment}{9}{subsection.2.2}%
-\contentsline {paragraph}{Code Explanation:}{10}{section*.9}%
-\contentsline {subsection}{\numberline {2.3}Background Music}{10}{subsection.2.3}%
-\contentsline {paragraph}{Code Explanation:}{11}{section*.10}%
-\contentsline {subsection}{\numberline {2.4}Final Environment}{12}{subsection.2.4}%
-\contentsline {section}{\numberline {3}Physics Implementation}{12}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Drag and Drop Implementation with DragControls}{12}{subsection.3.1}%
-\contentsline {paragraph}{Code Explanation:}{13}{section*.11}%
-\contentsline {section}{\numberline {4}Rule Implementation}{13}{section.4}%
+\contentsline {subsubsection}{\numberline {2.1.3}Board Class}{9}{subsubsection.2.1.3}%
+\contentsline {paragraph}{Class Structure}{9}{section*.9}%
+\contentsline {paragraph}{Button and Text Creation}{11}{section*.10}%
+\contentsline {paragraph}{Text Display and Updates}{11}{section*.11}%
+\contentsline {subsection}{\numberline {2.2}3D Background Environment}{12}{subsection.2.2}%
+\contentsline {paragraph}{Code Explanation:}{12}{section*.12}%
+\contentsline {subsection}{\numberline {2.3}Background Music}{13}{subsection.2.3}%
+\contentsline {paragraph}{Code Explanation:}{14}{section*.13}%
+\contentsline {subsection}{\numberline {2.4}Final Environment}{15}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Physics Implementation}{15}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Drag and Drop Implementation with DragControls}{15}{subsection.3.1}%
+\contentsline {paragraph}{Code Explanation:}{16}{section*.14}%
+\contentsline {section}{\numberline {4}Rule Implementation}{16}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Collision Detection}{16}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Drag-and-Drop Interaction}{17}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Rendering and Game State Update}{18}{subsection.4.3}%

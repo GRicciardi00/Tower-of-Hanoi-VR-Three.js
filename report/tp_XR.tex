@@ -417,8 +417,151 @@ mainStructure.setPosition(0, 0, 0);
 \end{figure}
 
 
+\subsubsection{Board Class}
+To manage the overall presentation and interaction in the Tower of Hanoi game, we implemented the \texttt{Board} class using JavaScript and the Three.js library. The \texttt{Board} class encompasses the visual representation of the game board, including buttons for essential actions and dynamic text to display moves and status.
 
+\paragraph{Class Structure}
+The \texttt{Board} class is designed to provide a customizable game board with default parameters for color, height, and width. It includes buttons for actions such as exit, reset, and play/pause, each with associated text for user guidance. The class maintains a count of moves and status information to enhance the gaming experience.
 
+\begin{lstlisting}[language=JavaScript, caption={JS Class for Board}]
+export class Board {
+  constructor(color = 'grey', boardHeight = 1, boardWidth = 1) {
+      this.color = color;
+      this.boardHeight = boardHeight;
+      this.boardWidth = boardWidth;
+      this.moves = 0; // Initialize moves
+      this.status = 'valid'; // Initialize status
+
+      // Create the board geometry and material
+      const boardGeometry = new THREE.PlaneGeometry(this.boardWidth, this.boardHeight);
+      const boardMaterial = new THREE.MeshBasicMaterial({ color: this.color, side: THREE.DoubleSide });
+      this.board = new THREE.Mesh(boardGeometry, boardMaterial);
+
+      // Create buttons
+      this.createButtons();
+      this.createText();
+  }
+
+  createButtons() {
+      // Define button dimensions
+      const buttonWidth = 0.6;
+      const buttonHeight = 0.2;
+      const buttonDepth = 0.1;
+      const buttonGeometry = new THREE.BoxGeometry(buttonWidth, buttonHeight, buttonDepth);
+
+      // Example: Exit Button
+      const exitMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // red color
+      this.exit = new THREE.Mesh(buttonGeometry, exitMaterial);
+      this.exit.position.set(-this.boardWidth / 2 + buttonWidth, this.boardHeight / 2 - buttonHeight, 0.1);
+      
+
+      // Example: Reset Button
+      const resetMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // blue color
+      this.reset = new THREE.Mesh(buttonGeometry, resetMaterial);
+      this.reset.position.set(-this.boardWidth / 2 + 3 * buttonWidth, this.boardHeight / 2 - buttonHeight, 0.1);
+      
+
+      const playMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // blue color
+      this.play = new THREE.Mesh(buttonGeometry, playMaterial);
+      this.play.position.set(-this.boardWidth / 2 + 5 * buttonWidth, this.boardHeight / 2 - buttonHeight, 0.1);
+
+      const loader = new FontLoader();
+      loader.load('./assets/helvetiker_regular.typeface.json', (font)=>{
+          const textOptions = {
+              font: font,
+              size: 0.05,
+              height: 0.05,
+          };
+      // Create text geometry for each button
+      const exitTextGeometry = new TextGeometry('Exit', textOptions);
+      const resetTextGeometry = new TextGeometry('Reset', textOptions);
+      const play_pauseTextGeometry = new TextGeometry('Play/Pause', textOptions);
+
+      // Create meshes for the text
+      const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const exitText = new THREE.Mesh(exitTextGeometry, textMaterial);
+      const resetText = new THREE.Mesh(resetTextGeometry, textMaterial);
+      const playPauseText = new THREE.Mesh(play_pauseTextGeometry, textMaterial);
+
+      // Position the text on the buttons
+      exitText.position.set(-0.1, -0.05, 0.05); // Adjust these values as needed
+      resetText.position.set(-0.1, -0.05, 0.05);
+      playPauseText.position.set(-0.1, -0.05, 0.05);
+
+      // Add the text to the buttons
+      console.log(this.exit)
+      this.exit.add(exitText);
+      this.reset.add(resetText);
+      this.play.add(playPauseText);
+      });
+
+      this.board.add(this.exit);
+      this.board.add(this.reset);
+      this.board.add(this.play);
+  }
+
+  createText() {
+        const loader = new FontLoader();
+        loader.load('./assets/helvetiker_regular.typeface.json', (font) => {
+          this.font = font; // Store the font for later use
+          this.updateMovesAndStatus(0, 'valid'); // Initial text setup
+      });
+    }
+
+    updateMovesAndStatus(moves, invalid) {
+      this.moves = moves;
+        if (invalid == true){
+          this.status = 'invalid';
+        }
+        else{
+          this.status = 'valid';
+        }
+
+      const textOptions = {
+          font: this.font,
+          size: 0.3,
+          height: 0.05,
+      };
+
+      // Update moves text
+      if (this.movesText) this.board.remove(this.movesText); // Remove old text
+      const movesTextGeometry = new TextGeometry('Moves: ' + this.moves, textOptions);
+      const movesTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      this.movesText = new THREE.Mesh(movesTextGeometry, movesTextMaterial);
+      this.movesText.position.set(-this.boardHeight / 2, 0, 0);
+      this.board.add(this.movesText);
+
+      // Update status text
+      if (this.statusText) this.board.remove(this.statusText); // Remove old text
+      const statusTextGeometry = new TextGeometry('Status: ' + this.status, textOptions);
+      const statusTextMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      this.statusText = new THREE.Mesh(statusTextGeometry, statusTextMaterial);
+      this.statusText.position.set(-this.boardHeight / 2, -this.boardWidth / 4, 0);
+      this.board.add(this.statusText);
+  }
+}
+\end{lstlisting}
+
+\paragraph{Button and Text Creation}
+The \texttt{createButtons} method generates interactive buttons on the board, such as exit, reset, and play/pause. These buttons include 3D geometries with associated materials for visual appeal. Text labels are added to the buttons using the Three.js library's capabilities.
+
+\paragraph{Text Display and Updates}
+The \texttt{createText} method initializes the font for later use in displaying text on the board. The \texttt{updateMovesAndStatus} method dynamically updates and displays the move count and game status. This interactive text provides valuable feedback to the player during gameplay.
+
+\begin{lstlisting}[language=JavaScript, caption={JS Example for Board}]
+// Example Usage
+const gameBoard = new Board('blue', 2, 2);
+gameBoard.updateMovesAndStatus(5, false);
+\end{lstlisting}
+
+In this example, a game board is instantiated with specific parameters, and the moves and status are updated during gameplay. The \texttt{Board} class enhances the Tower of Hanoi game interface, combining visual elements and interactivity for an engaging user experience.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{img/board.png}
+    \caption{Instance of Board}
+    \label{fig:board}
+\end{figure}
 
 
 \subsection{3D Background Environment}
@@ -578,6 +721,148 @@ This implementation provides an intuitive way for users to interact with the Tow
 
 
 \section{Rule Implementation}
+
+In the Tower of Hanoi game, the implementation of rules is crucial for ensuring a challenging and engaging experience. One of the key functions responsible for enforcing game rules is the \texttt{checkCollisions} function.
+
+\subsection{Collision Detection}
+
+The \texttt{checkCollisions} function is responsible for detecting collisions between disks during gameplay. It utilizes the bounding box technique to determine if any two disks intersect. The bounding box for each disk is updated based on its current position and orientation in the 3D space.
+
+\begin{lstlisting}[language=JavaScript, caption={Collision Detection Function}]
+function checkCollisions() {
+    scene.disk1BB.copy(scene.disks[0].mesh.geometry.boundingBox).applyMatrix4(scene.disks[0].mesh.matrixWorld);
+    scene.disk2BB.copy(scene.disks[1].mesh.geometry.boundingBox).applyMatrix4(scene.disks[1].mesh.matrixWorld);
+    scene.disk3BB.copy(scene.disks[2].mesh.geometry.boundingBox).applyMatrix4(scene.disks[2].mesh.matrixWorld);
+
+    // Check for collisions between Disk 1 and Disk 2
+    if (scene.disk1BB.intersectsBox(scene.disk2BB)) {
+        if (scene.disks[0].mesh.position.y > scene.disks[1].mesh.position.y) {
+            Invalid = true;
+        }
+    }
+
+    // Check for collisions between Disk 1 and Disk 3
+    if (scene.disk1BB.intersectsBox(scene.disk3BB)) {
+        if (scene.disks[0].mesh.position.y > scene.disks[2].mesh.position.y) {
+            Invalid = true;
+        }
+    }
+    // Check for collisions between Disk 2 and Disk 3
+    if (scene.disk2BB.intersectsBox(scene.disk3BB)) {
+        if (scene.disks[1].mesh.position.y > scene.disks[2].mesh.position.y) {
+            Invalid = true;
+        }
+    }
+}
+\end{lstlisting}
+
+In the code snippet above, the function checks for collisions between each pair of disks (Disk 1 and Disk 2, Disk 1 and Disk 3, Disk 2 and Disk 3) and updates the game state accordingly.
+
+This collision detection mechanism adds a layer of complexity to the Tower of Hanoi game, requiring players to adhere to the rules and make strategic moves to successfully complete the puzzle.
+
+
+\subsection{Drag-and-Drop Interaction}
+
+Enabling a seamless drag-and-drop interaction for the Tower of Hanoi game enhances the user experience and allows players to make strategic moves. The implementation involves utilizing event listeners and controls provided by the Three.js library.
+
+\begin{lstlisting}[language=JavaScript, caption={Drag-and-Drop Interaction}]
+    scene.controls.addEventListener( 'drag', function(event){
+        if (selected?.body.getCollisionFlags() === 2) {
+            const { x, y } = pointer
+            const speed = 0.03
+            const movementX = (x - prev.x) * speed
+            const movementZ = (y - prev.y) * -speed
+            selected.position.x += movementX
+            selected.position.z += movementZ
+            selected.body.needUpdate = true
+            prev = { x, y }
+        }
+        selectedObject = event.object
+        render();
+    } );
+
+document.addEventListener( 'pointermove', onPointerMove );
+document.addEventListener( 'pointerdown', onPointerDown );
+
+scene.controls.addEventListener('dragstart', function (event) {
+    // Disable orbit control during drag
+    makingMove = true;
+    orbitControls.enabled = false;
+    selectedObject = event.object;
+
+    // Check for intersecting disks during drag start
+    const intersects_disks = raycaster.intersectObjects( scene.disks_mashes, true );
+    if ( intersects_disks.length > 0 ) {
+        intersects_disks[0].object.material.color.set( 0xffb3b3 ); // Change color of selected object
+        let disk_onTop = hasDisksOnTop(intersects_disks[0].object,scene.disks_mashes);
+        console.log("disk on top variable: ",disk_onTop);
+
+        if(disk_onTop === false){
+            selected = intersects_disks[0].object;
+            console.log("selected: ",selected.body.getCollisionFlags());
+            selected.body.setCollisionFlags(2); // Set collision flag for the dragged disk
+        }
+    }
+});
+
+scene.controls.addEventListener('dragend', function (event) {
+    // Enable orbit control after drag ends
+    makingMove = false;
+    orbitControls.enabled = true;
+    const selectedObject = event.object;
+
+    // Check if the dragged object is a disk
+    if (selectedObject.body.getCollisionFlags() === 2){
+        movesMade +=1; // Increment move count
+    }
+
+    selectedObject.material.color.setHex( CURRENTCOLOR );
+    selectedObject.body.setCollisionFlags(0); // Reset collision flag
+
+    // When the object is dropped, check if it is on the table
+    // If on the table, set the collision flag to 1 (static)
+    selectedObject.body.on.collision((otherObject, event) => {
+        if (otherObject.name === 'table') selectedObject.body.setCollisionFlags(1);
+    })
+
+    selected = null; // Reset selected object
+});
+\end{lstlisting}
+
+In the provided code snippet, the drag-and-drop interaction is handled through event listeners and controls. The drag, dragstart, and dragend events are utilized to manage the state of the interaction, enable/disable orbit control, and update relevant parameters.
+
+The drag-and-drop feature enhances player control and adds an interactive layer to the Tower of Hanoi game.
+
+\subsection{Rendering and Game State Update}
+
+The rendering process in the Tower of Hanoi game plays a crucial role in updating the game state, including the move count and game status. The \texttt{render} function is responsible for orchestrating these updates, ensuring a smooth and responsive gaming experience.
+
+\begin{lstlisting}[language=JavaScript, caption={Rendering and Game State Update}]
+function render(event) {
+    // Check for collisions if not in the process of making a move
+    if (makingMove == false) {
+        checkCollisions();
+    }
+
+    // Update physics simulation
+    physics.update(clock.getDelta() * 1000);
+    physics.updateDebugger();
+
+    // Render the scene
+    scene.renderer.render(scene.scene, scene.camera);
+
+    // Update the game board with the latest move count and status
+    scene.gameBoard.updateMovesAndStatus(movesMade, Invalid);
+}
+
+// Initial update of the game board state
+scene.gameBoard.updateMovesAndStatus(movesMade, Invalid);
+\end{lstlisting}
+
+In the code snippet above, the \texttt{render} function is described as the central hub for updating the game state during the rendering process. It checks for collisions, updates the physics simulation, renders the scene, and ensures that the game board reflects the latest move count and status.
+
+This integration of rendering and game state update contributes to a responsive and visually informative Tower of Hanoi gaming experience.
+
 
 
 \end{document}
