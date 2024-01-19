@@ -53,7 +53,7 @@ const ThreeScene = () => {
     scene.controls.addEventListener( 'drag', function(event){
         if (selected?.body.getCollisionFlags() === 2) {
             const { x, y } = pointer
-            const speed = 0.03
+            const speed = 0.1
             const movementX = (x - prev.x) * speed
             const movementZ = (y - prev.y) * -speed
             selected.position.x += movementX

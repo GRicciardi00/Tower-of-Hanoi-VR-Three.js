@@ -64,7 +64,7 @@
     \vspace*{3cm}
     \textsc{\LARGE Université Paris Saclay}\\[2.0 cm]
     \textsc{\Large Virtual and Mixed Reality}\\[0.5 cm]
-    \textsc{\Large Master of Research in Artificial Intelligence and Machine Vision}\\[0.5 cm]
+    \textsc{\Large Master 2 in Mechatronics, Machine Vision, Artificial Intelligence}\\[0.5 cm]
     \rule{\linewidth}{0.2 mm} \\[0.4 cm]
     { \LARGE \textbf{Lab session} \\[0.4 cm] }
     { \Large {Using and Programming Virtual Reality Headsets} \\[0.4 cm] }
@@ -123,8 +123,7 @@ This report provides an overview of the extended reality (XR) game development p
 \begin{itemize}
     \item Yann Terrom - Contributed to the project's structural development, including setting up the project using npm. Worked on creating fundamental game objects such as disks, the main game structure, background music, and the 3D environment.
 
-    \item Dat Nguyen - Collaborated on object selection and played a crucial role in refining the physics of the game, incorporating elements like gravity and collision detection.
-
+    \item Dat Nguyen - Took a hands-on approach in the implementation of the game logic, contributing to the aspects of the gaming experience. Worked on shaping the behavior, rules, and interactive elements within the game.
     \item Giuseppe Ricciardi - Collaborated on object selection and played a crucial role in refining the physics of the game, incorporating elements like gravity and collision detection.
 
     \item Chakib Gamir - Contributed to the project's structural development, including setting up the project using npm. Worked on creating fundamental game objects such as disks, the main game structure, background music, and the 3D environment.
@@ -661,43 +660,54 @@ setUpAudio() {
 
 This code segment ensures the seamless integration of background music into the Tower of Hanoi extended reality game, contributing to a more immersive and enjoyable gaming experience.
 
-\newpage
 \subsection{Final Environment}
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=1\textwidth]{img/result.png}
     \caption{Final Environment with 3 Disks, Main Structure, Background, and Music.}
     \label{fig:final_environment}
 \end{figure}
+\newpage
+\section{Selection and manipulation techniques}
+\subsection{Raycaster for Object Selection}
+The \textbf{Raycaster} serves as a fundamental tool in enabling precise object selection within the virtual environment. In the Tower of Hanoi VR game, it plays a key role in detecting user interactions with game elements. By casting a virtual ray into the scene, the Raycaster identifies the object or objects intersected by the ray, allowing for targeted selection.
+\begin{lstlisting}[language=JavaScript, caption={Use of Raycaster}]
+    //Raycaster Initialization
+    raycaster = new THREE.Raycaster();
+    raycaster.params.Line.threshold = 3;
+    ...
+    //Use of raycaster to allow player to drag the disk
+    scene.controls.addEventListener('dragstart', function (event) {
+    // Disable orbit control during drag
+    makingMove = true;
+    orbitControls.enabled = false;
+    selectedObject = event.object;
 
-\section{Physics Implementation}
+    // Check for intersecting disks during drag start
+    const intersects_disks = raycaster.intersectObjects( scene.disks_mashes, true );
+    if ( intersects_disks.length > 0 ) {
+        intersects_disks[0].object.material.color.set( 0xffb3b3 ); // Change color of selected object
+        let disk_onTop = hasDisksOnTop(intersects_disks[0].object,scene.disks_mashes);
+    ...}
+\end{lstlisting}
+To enhance \textbf{player feedback} and facilitate easier interaction with the environment, the color of the disks intersected by the raycaster is altered.
 \subsection{Drag and Drop Implementation with DragControls}
-
-To enhance user interaction, we implemented the drag and drop functionality using DragControls in Three.js. This feature allows users to select and move game objects seamlessly within the 3D environment.
-
+To enhance user interaction, we implemented the drag and drop functionality using \textbf{DragControls} in Three.js. This feature allows users to select and move game objects seamlessly within the 3D environment.
 \begin{lstlisting}[language=JavaScript, caption={JS Class for Drag Control}]
 export class DraggablesManager {
   constructor(objects, camera, renderer, scene) {
     this.objects = objects;
-    this.dragControls = new DragControls(this.objects, camera, renderer.domElement);
-
-    //this.dragControls.addEventListener('hoveron', this.onHoverOn.bind(this));
-    //this.dragControls.addEventListener('hoveroff', this.onHoverOff.bind(this));
-
+    this.dragControls = new DragControls(this.objects, camera, renderer.domElement)
   }
-
   addObject(object) {
     this.objects.push(object);
     this.dragControls.setObjects(this.objects);
   }
-
   onHoverOn(event) {
     // Add your logic when hovering on an object
     const hoveredObject = event.object;
     console.log('Hovered on:', hoveredObject);
   }
-
   onHoverOff(event) {
     // Add your logic when hovering off an object
     const unhoveredObject = event.object;
@@ -705,9 +715,8 @@ export class DraggablesManager {
   }
 }
 \end{lstlisting}
-
+\newpage
 \paragraph{Code Explanation:}
-
 \begin{itemize}
     \item \textbf{DragControls Initialization:} We initialized the DragControls to enable the drag and drop functionality. This included creating an instance of DragControls, associating it with the camera and the array of draggable objects.
 
@@ -719,9 +728,91 @@ export class DraggablesManager {
 
 This implementation provides an intuitive way for users to interact with the Tower of Hanoi game by selecting and moving objects using drag and drop functionality.
 
+\newpage
+
+\section{Physics Implementation}
+The implementation of physics plays a crucial role in creating a realistic and interactive user experience. Leveraging the \textbf{enable3d} library, which integrates the Ammo.js physics engine with Three.js, we were able to introduce dynamic, static, and kinematic bodies, along with various features such as compound shapes, constraints, CCD motion clamping, and more. This chapter delves into the key aspects of the physics implementation, illustrating how it enhances the overall realism and interactivity of the game.
+\subsection{Enabling Physics with ''Enable3d'' and ''Ammo.js''}
+The foundation of the physics implementation lies in the integration of Ammo.js through enable3d. \textbf{Ammo.js} is a direct JavaScript port of the popular C++ physics engine called Bullet Physics. Bullet Physics is widely used in the gaming industry and is known for its stability, performance, and extensive set of features. he AmmoPhysics class facilitates the addition of physics to the Three.js scene, providing a robust framework for simulating real-world interactions. With enable3d, we effortlessly introduced physics to static elements, such as the game table, as well as dynamic elements, like the Tower of Hanoi disks.
+\begin{lstlisting}[language=JavaScript, caption={Ammophyiscs and PhyisicsLoader}]
+...
+import * as ENABLE3D from '@enable3d/ammo-physics';
+
+...
+const clock = new THREE.Clock()
+let physics;
+const { AmmoPhysics, PhysicsLoader } = ENABLE3D
+...
+//Threescene is the main script
+const ThreeScene = () => {
+    //INIT
+    scene = new Scene();
+    physics = new AmmoPhysics(scene.scene);
+    CURRENTCOLOR = scene.disks_mashes[0].material.color.getHex();
+    physics = new AmmoPhysics(scene.scene);
+    //Add physics to the scene
+    physics.debug.enable();
+    ...}
+    
+....
+
+//Rendering of physics
+function render(event) {
+    physics.update(clock.getDelta() * 1000);
+    physics.updateDebugger();
+    scene.renderer.render(scene.scene, scene.camera);
+    // ... (existing logic for updating moves and status)
+}
+
+//...
+
+
+//The PhysicsLoader takes care of loading the wasm and js files of Ammo.js before starting the script.
+window.addEventListener('DOMContentLoaded', () => {
+    PhysicsLoader('/ammo', () => ThreeScene())
+  })
+\end{lstlisting}
+The \textit{physics debugger} helps us see and understand the shapes controlled by the physics engine, making it easier to understand the collisions between the various objects in the scene.
+\newpage 
+\subsection{Static Ground and Disks implementation}
+To establish a stable foundation for the game, a static ground was introduced. \\
+This ground, representing the game table, was created with zero mass to ensure it remains stationary throughout the game.
+
+\begin{lstlisting}
+physics.add.existing(scene.table, { name: "table", mass: 0 });  
+\end{lstlisting}
+\textbf{Dynamic bodies} were applied to each disk, allowing them to respond to external forces such as gravity and user interactions. The offset property was utilized to fine-tune the position of the disks within the physics simulation.
+\begin{lstlisting}
+physics.add.existing(scene.disk1.mesh, { mass: 1, offset: { y: -0.05 } });
+physics.add.existing(scene.disk2.mesh, { mass: 1, offset: { y: -0.05 } });
+physics.add.existing(scene.disk3.mesh, { mass: 1, offset: { y: -0.05 } });
+\end{lstlisting}
+The main advantage of the enable3d library is the presence of numerous predefined shapes that can be used to represent objects in the physical world. Some of these shapes are:
+\begin{itemize}
+    \item Box Shape: represents a rectangular prism or cube.
+    \item Sphere Shape: represents a spherical object.
+    \item Cylinder Shape: represents a cylindrical object.
+    \item Cone Shape: represents a cone-shaped object.
+    \item Capsule Shape: combines a cylinder and two hemispheres, resembling a capsule.
+    \item Convex Hull Shape: represents a convex hull, providing a simplified representation of a complex mesh.
+    \item Compound Shape: allows combining multiple shapes to create more complex geometries.
+    \item Trimesh Shape: represents a triangle mesh.
+\end{itemize}
+\textit{Compound shapes} in enable3d provide the option to utilize automatically generated shapes by specifying the "shape" parameter as "hacd," "convexMesh," or "concaveMesh."
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = \textwidth]{img/physics-debug.jpeg}
+    \caption{View of physics debug tool}
+    \label{fig:physics-debug}
+\end{figure}
+
+\subsection{Physics Constraints}
+The control of the \textbf{setCollisionFlag} is a pivotal aspect of managing the physics interactions. This flag determines whether an object within the physics simulation is allowed to collide with other objects or remain static.\\
+When a user initiates a move, such as dragging a Tower of Hanoi disk, the setCollision flag is manipulated to control its behavior. Initially set to 2 during the dragstart event, this flag designates the disk as movable, allowing it to interact dynamically with the environment. Once the user completes the move, during the dragend event, the flag is reset to 0, indicating that the disk should no longer respond to external forces, effectively making it static.\\
+Additionally, we leverage the setCollision flag when interacting with the game table, which serves as the static ground. If a disk collides with the table, the collision event is detected, and the disk's setCollision flag is set to 1, rendering it static and preventing further movement.\\
+This controlled manipulation of the setCollision flag ensures a seamless and intuitive user experience, allowing for dynamic interactions during user-initiated moves while maintaining stability and preventing unintended collisions with static elements in the virtual environment.
 
 \section{Rule Implementation}
-
 In the Tower of Hanoi game, the implementation of rules is crucial for ensuring a challenging and engaging experience. One of the key functions responsible for enforcing game rules is the \texttt{checkCollisions} function.
 
 \subsection{Collision Detection}
