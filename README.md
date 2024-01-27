@@ -9,5 +9,5 @@ All the authors are the collaborators of this repository.
 - @Enable3D
 - Vite
 ## How to run
-To run it locally download the repository, assure to have all the libraries install (npm install). <br/>
+To run it locally download the repository, assure to have all the libraries installed (npm install). <br/>
 From terminal, access src folder and launch the command "npm run dev"
