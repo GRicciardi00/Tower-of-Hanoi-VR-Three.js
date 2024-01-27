@@ -1,2 +1,1 @@
-# Virtual and mixed reality Project
- 
+Tower of Hanoi game for VR with Three.js
