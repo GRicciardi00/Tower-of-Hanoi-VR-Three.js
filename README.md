@@ -1,7 +1,7 @@
 # Tower of Hanoi game for VR with Three.js
 
 ## Introduction
-University project for "Augmented and Virtual Reality course", implementation of the Tower of Hanoi puzzle made for VR via Three.js and Enable3D to enable physics. <br />
+Implementation of the Tower of Hanoi puzzle made for VR via Three.js and Enable3D to enable physics. <br />
 All the authors are the collaborators of this repository.
 ## Libraries
 - Three.js
