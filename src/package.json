@@ -4,7 +4,7 @@
     "three": "^0.156.1"
   },
   "devDependencies": {
-    "vite": "^4.5.2"
+    "vite": "^8.0.16"
   },
   "scripts": {
     "dev": "vite",
